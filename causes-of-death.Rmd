@@ -1,0 +1,29 @@
+---
+title: "Causes of death in the world"
+author: "N'Djo-Soro Coulibaly, Ciré Keïta, Higo Aragao, Thi Tran"
+date: "2024-03-05"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+## Context of the problem
+  Il est question d'analyser des données concernant les causes de mortalité dans le monde. Pour mener à bien cette analyse, nous avons defini des questions sur lesquelles travailler:
+  
+  1) Les 10 principales causes de mort dans le monde ?
+  2) Les 5 principales causes sur chaque continent ?
+  3) L'évolution du taux des décès au fil des années ?
+
+D'autres questions pourront être ajoutées au fur et à mesure pour plus de précisions et d'interprétations
+
+
+## Read Dataset
+Source: https://www.kaggle.com/datasets/ivanchvez/causes-of-death-our-world-in-data
+
+```{r}
+library(tidyverse)
+
+data <- read_delim("20222703-causes-f-death-clean-output-v2.0.csv", delim=",")
+```
+
