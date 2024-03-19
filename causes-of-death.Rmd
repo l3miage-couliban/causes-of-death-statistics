@@ -10,20 +10,48 @@ output:
 
 ## Context of the problem
   Il est question d'analyser des données concernant les causes de mortalité dans le monde. Pour mener à bien cette analyse, nous avons defini des questions sur lesquelles travailler:
-  
-  1) Les 10 principales causes de mort dans le monde ?
-  2) Les 5 principales causes sur chaque continent ?
-  3) L'évolution du taux des décès au fil des années ?
+  2) Les 10 principales causes de mort dans le monde ? 
+    - Quelle décision prendre à partir du résultat
+  3) Les 5 principales causes sur chaque continent ? 
+  4) L'évolution des décès au fil des années (2007 - 2019) ?
+  5) representation graphique map
+  6) Ajout des données démographiques
+
+
+## Comment les données ont-elles été recuillies ?
+Les données proviennent de Our World In Data
+Source: https://www.kaggle.com/datasets/ivanchvez/causes-of-death-our-world-in-data
+
+
 
 D'autres questions pourront être ajoutées au fur et à mesure pour plus de précisions et d'interprétations
 
 
 ## Read Dataset
-Source: https://www.kaggle.com/datasets/ivanchvez/causes-of-death-our-world-in-data
 
 ```{r}
 library(tidyverse)
 
 data <- read_delim("20222703-causes-f-death-clean-output-v2.0.csv", delim=",")
 ```
+## 10 firsts Number of deaths by cause
+%>%
+  group_by(`Causes name`) %>%
+  summarize(n=sum(as.numeric(`Death Numbers`)))
+  
+```{r}
+ndc <- data %>%
+  filter(!is.na(Code)) %>%
+  filter(!is.na(`Death Numbers`)) %>%
+  group_by(`Causes name`) %>%
+  summarize(`Death Numbers`=sum(as.numeric(`Death Numbers`))) %>%
+  arrange(desc(`Death Numbers`)) %>%
+  top_n(10)
+```
 
+## 5 firsts causes of death on each continent
+```{r}
+area <- data %>%
+  filter(is.na(Code))
+  filter(Entity="")
+```
