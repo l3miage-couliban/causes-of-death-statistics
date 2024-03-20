@@ -32,8 +32,36 @@ D'autres questions pourront être ajoutées au fur et à mesure pour plus de pr�
 ```{r}
 library(tidyverse)
 
-data <- read_delim("20222703-causes-f-death-clean-output-v2.0.csv", delim=",")
+CausesData <- read_delim("20222703-causes-f-death-clean-output-v2.0.csv", delim=",") %>%
+  rename(iso_code=Code) %>%
+  filter(Year %in% 1990:2019) %>%
+  filter(!is.na(iso_code));
 ```
+
+
+```{r}
+CountriesData <- read_delim("owid-co2-data.csv",delim=",") %>%
+  select(year, iso_code, population, gdp) %>%
+  filter(year %in% 1990:2019) %>%
+  filter(!is.na(iso_code));
+```
+
+```{r}
+ContientsData <- read_delim("continents2.csv",delim=",");
+```
+## getCountries
+```{r}
+countries <- CausesData %>% select(Entity, iso_code) %>% distinct(Entity, iso_code);
+```
+
+## join both dataframes
+```{r}
+#data <- merge(CausesData, CountriesData, by="iso_code");
+data <- left_join(CausesData, CountriesData, by=c("iso_code"="iso_code", "Year"="year")) %>%
+  arrange(Year);
+```
+
+
 ## 10 firsts Number of deaths by cause
 %>%
   group_by(`Causes name`) %>%
