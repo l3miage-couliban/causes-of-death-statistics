@@ -47,17 +47,17 @@ CountriesData <- read_delim("owid-co2-data.csv",delim=",") %>%
 ```
 
 ```{r}
-ContientsData <- read_delim("continents2.csv",delim=",");
-```
-## getCountries
-```{r}
-countries <- CausesData %>% select(Entity, iso_code) %>% distinct(Entity, iso_code);
+ContinentsData <- read_delim("continents2.csv",delim=",") %>%
+  select('alpha-3', region) %>%
+  rename(iso_code='alpha-3') %>%
+  filter(!is.na(region));
 ```
 
 ## join both dataframes
 ```{r}
 #data <- merge(CausesData, CountriesData, by="iso_code");
 data <- left_join(CausesData, CountriesData, by=c("iso_code"="iso_code", "Year"="year")) %>%
+  left_join(ContinentsData, by=c("iso_code"="iso_code")) %>%
   arrange(Year);
 ```
 
