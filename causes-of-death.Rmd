@@ -32,7 +32,7 @@ D'autres questions pourront être ajoutées au fur et à mesure pour plus de pr�
 ```{r}
 library(tidyverse)
 
-CausesData <- read_delim("20222703-causes-f-death-clean-output-v2.0.csv", delim=",") %>%
+CausesData <- read_csv("20222703-causes-f-death-clean-output-v2.0.csv", show_col_types = FALSE) %>%
   rename(iso_code=Code) %>%
   filter(Year %in% 1990:2019) %>%
   filter(!is.na(iso_code));
@@ -40,14 +40,14 @@ CausesData <- read_delim("20222703-causes-f-death-clean-output-v2.0.csv", delim=
 
 
 ```{r}
-CountriesData <- read_delim("owid-co2-data.csv",delim=",") %>%
+CountriesData <- read_csv("owid-co2-data.csv") %>%
   select(year, iso_code, population, gdp) %>%
   filter(year %in% 1990:2019) %>%
   filter(!is.na(iso_code));
 ```
 
 ```{r}
-ContinentsData <- read_delim("continents2.csv",delim=",") %>%
+ContinentsData <- read_csv("continents2.csv") %>%
   select('alpha-3', region) %>%
   rename(iso_code='alpha-3') %>%
   filter(!is.na(region));
@@ -58,28 +58,100 @@ ContinentsData <- read_delim("continents2.csv",delim=",") %>%
 #data <- merge(CausesData, CountriesData, by="iso_code");
 data <- left_join(CausesData, CountriesData, by=c("iso_code"="iso_code", "Year"="year")) %>%
   left_join(ContinentsData, by=c("iso_code"="iso_code")) %>%
-  arrange(Year);
+  arrange(Year)
 ```
 
 
-## 10 firsts Number of deaths by cause
-%>%
-  group_by(`Causes name`) %>%
-  summarize(n=sum(as.numeric(`Death Numbers`)))
-  
 ```{r}
-ndc <- data %>%
-  filter(!is.na(Code)) %>%
-  filter(!is.na(`Death Numbers`)) %>%
-  group_by(`Causes name`) %>%
-  summarize(`Death Numbers`=sum(as.numeric(`Death Numbers`))) %>%
-  arrange(desc(`Death Numbers`)) %>%
-  top_n(10)
+library(dplyr)
+library(scales)
+
+#Americas region et gdp
+region_america <- data %>%
+  filter(region == "Americas", Year != 2019)
+gdp_america <- region_america %>%
+  group_by(Year) %>%
+  summarise(gdp_total = sum(gdp, na.rm = TRUE)/10000000000)
+
+#Africa region et gdp
+region_africa <- data %>%
+  filter(region == "Africa", Year != 2019)
+gdp_africa <- region_africa %>%
+  group_by(Year) %>%
+  summarise(gdp_total = sum(gdp, na.rm = TRUE)/10000000000)
+
+#Asia region et gdp
+region_asia <- data %>%
+  filter(region == "Asia",Year != 2019)
+gdp_asia <- region_asia %>%
+  group_by(Year) %>%
+  summarise(gdp_total = sum(gdp, na.rm = TRUE)/1000000000)
+
+#Europe region et gdp
+region_europe <- data %>%
+  filter(region == "Europe",Year != 2019)
+gdp_europe <- region_europe %>%
+  group_by(Year) %>%
+  summarise(gdp_total = sum(gdp, na.rm = TRUE)/1000000000)
+
+#Oceania region et gdp
+region_oceania <- data %>%
+  filter(region == "Oceania",Year != 2019)
+gdp_oceania <- region_oceania %>%
+  group_by(Year) %>%
+  summarise(gdp_total = sum(gdp, na.rm = TRUE)/1000000000)
 ```
 
-## 5 firsts causes of death on each continent
 ```{r}
-area <- data %>%
-  filter(is.na(Code))
-  filter(Entity="")
+#Les Graphiques
+
+#Afrique 
+library(ggplot2)
+ggplot(gdp_africa, aes(x = Year, y = gdp_total)) +
+  geom_line() +
+  labs(x = "Annee", y = "gdp Total", color = "Region") +
+  theme_minimal() +
+  ggtitle("")+
+  scale_x_continuous(breaks = seq(1990, 2018, by = 2))
+```
+```{r}
+#Americas 
+library(ggplot2)
+ggplot(gdp_america, aes(x = Year, y = gdp_total)) +
+  geom_line() +
+  labs(x = "Annee", y = "gdp Total", color = "Region") +
+  theme_minimal() +
+  ggtitle("")+
+  scale_x_continuous(breaks = seq(1990, 2018, by = 2))
+```
+```{r}
+#Oceania
+library(ggplot2)
+ggplot(gdp_oceania, aes(x = Year, y = gdp_total)) +
+  geom_line() +
+  labs(x = "Annee", y = "gdp Total", color = "Region") +
+  theme_minimal() +
+  ggtitle("")+
+  scale_x_continuous(breaks = seq(1990, 2018, by = 2))
+```
+```{r}
+#Europe 
+library(ggplot2)
+ggplot(gdp_europe, aes(x = Year, y = gdp_total)) +
+  geom_line() +
+  labs(x = "Annee", y = "gdp Total", color = "Region") +
+  theme_minimal() +
+  ggtitle("")+
+  scale_x_continuous(breaks = seq(1990, 2018, by = 2))
+```
+
+```{r}
+#Asia
+library(ggplot2)
+ggplot(gdp_asia, aes(x = Year, y = gdp_total)) +
+  geom_line() +
+  labs(x = "Annee", y = "gdp Total", color = "Region") +
+  theme_minimal() +
+  ggtitle("")+
+  scale_x_continuous(breaks = seq(1990, 2018, by = 2))
 ```
