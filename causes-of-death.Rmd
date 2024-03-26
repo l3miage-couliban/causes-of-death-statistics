@@ -27,33 +27,42 @@ Source: https://www.kaggle.com/datasets/ivanchvez/causes-of-death-our-world-in-d
 D'autres questions pourront être ajoutées au fur et à mesure pour plus de précisions et d'interprétations
 
 
-## Read Dataset
+# Read Dataset
 
+## Causes of death
+Les données proviennent de Our World In Data
+Source: https://www.kaggle.com/datasets/ivanchvez/causes-of-death-our-world-in-data
 ```{r}
 library(tidyverse)
+library(ggplot2)
+theme_set(theme_minimal())
 
-CausesData <- read_delim("20222703-causes-f-death-clean-output-v2.0.csv", delim=",") %>%
+CausesData <- read_csv("20222703-causes-f-death-clean-output-v2.0.csv") %>%
   rename(iso_code=Code) %>%
   filter(Year %in% 1990:2019) %>%
   filter(!is.na(iso_code));
 ```
-
+## Countries data
 
 ```{r}
-CountriesData <- read_delim("owid-co2-data.csv",delim=",") %>%
+CountriesData <- read_csv("owid-co2-data.csv") %>%
   select(year, iso_code, population, gdp) %>%
   filter(year %in% 1990:2019) %>%
   filter(!is.na(iso_code));
 ```
 
+## Countries with their region
+source:  https://github.com/lukes/ISO-3166-Countries-with-Regional-Codes/blob/master/all/all.csv.
+These lists are the result of merging data from two sources, the Wikipedia ISO 3166-1 article for alpha and numeric country codes, and the UN Statistics site for countries' regional, and sub-regional codes. In addition to countries, it includes dependent territories.
+
 ```{r}
-ContinentsData <- read_delim("continents2.csv",delim=",") %>%
-  select('alpha-3', region) %>%
+ContinentsData <- read_csv("continents2.csv") %>%
+  select('alpha-3', region, name) %>%
   rename(iso_code='alpha-3') %>%
   filter(!is.na(region));
 ```
 
-## join both dataframes
+## join dataframes
 ```{r}
 #data <- merge(CausesData, CountriesData, by="iso_code");
 data <- left_join(CausesData, CountriesData, by=c("iso_code"="iso_code", "Year"="year")) %>%
@@ -62,14 +71,14 @@ data <- left_join(CausesData, CountriesData, by=c("iso_code"="iso_code", "Year"=
 ```
 
 
-## 10 firsts Number of deaths by cause
+## 10 firsts causes of death
 %>%
   group_by(`Causes name`) %>%
   summarize(n=sum(as.numeric(`Death Numbers`)))
   
 ```{r}
 ndc <- data %>%
-  filter(!is.na(Code)) %>%
+  filter(!is.na(iso_code)) %>%
   filter(!is.na(`Death Numbers`)) %>%
   group_by(`Causes name`) %>%
   summarize(`Death Numbers`=sum(as.numeric(`Death Numbers`))) %>%
@@ -77,9 +86,154 @@ ndc <- data %>%
   top_n(10)
 ```
 
-## 5 firsts causes of death on each continent
+
+# COURBE D'EVOLUTION DU NOMBRE DE MORT SUR CHAQUE CONTINENT
+
 ```{r}
-area <- data %>%
-  filter(is.na(Code))
-  filter(Entity="")
+deathNumberInAfrica <- data %>%
+  filter(region=="Africa") %>%
+  group_by(Year) %>%
+  summarise(death_numbers=sum(`Death Numbers`, na.rm = TRUE)) %>%
+  mutate(divide_per_one_million=death_numbers / 1000000);
+
+deathNumberInAfrica %>%
+  ggplot() + 
+  aes(x = Year, y = divide_per_one_million) +
+  geom_line(stat = "identity", width = 0.5) +
+  labs(
+    title = "Evolution du nombre de décès en Afrique",
+    x = "Années",
+    y = "Nombre de décès (en millions)"
+  )+
+  scale_x_continuous(breaks = seq(1990, 2019, by=5));
+  
 ```
+
+```{r}
+deathNumberInAmerica <- data %>%
+  filter(region=="Americas") %>%
+  group_by(Year) %>%
+  summarise(death_numbers=sum(`Death Numbers`, na.rm = TRUE)) %>%
+  mutate(divide_per_one_million=death_numbers / 1000000);
+
+deathNumberInAmerica %>%
+  ggplot() + 
+  aes(x = Year, y = divide_per_one_million) +
+  geom_line(stat = "identity", width = 0.5) +
+  labs(
+    title = "Evolution du nombre de décès en Amerique",
+    x = "Années",
+    y = "Nombre de décès (en millions)"
+  );
+  
+```
+
+```{r}
+deathNumberInAsia <- data %>%
+  filter(region=="Asia") %>%
+  group_by(Year) %>%
+  summarise(death_numbers=sum(`Death Numbers`, na.rm = TRUE)) %>%
+  mutate(divide_per_one_million=death_numbers / 1000000);
+
+deathNumberInAsia %>%
+  ggplot() + 
+  aes(x = Year, y = divide_per_one_million) +
+  geom_line(stat = "identity", width = 0.5) +
+  labs(
+    title = "Evolution du nombre de décès en Asie",
+    x = "Années",
+    y = "Nombre de décès (en million)"
+  );
+```
+
+```{r}
+coeff <- 1000000000;
+
+deathNumberInEurope <- data %>%
+  filter(region=="Europe") %>%
+  group_by(Year) %>%
+  summarise(death_numbers=sum(`Death Numbers`, na.rm = TRUE)) %>%
+  mutate(divide_per_one_million=death_numbers / 1000000);
+
+deathNumberInEurope %>%
+  ggplot(aes(x = Year)) +
+  geom_line(stat = "identity", width = 0.5, aes(y=death_numbers / 1000000)) +
+  labs(
+    title = "Evolution du nombre de décès en Europe",
+    x = "Années",
+    y = "Nombre de décès (en milliers)"
+  )
+```
+
+```{r}
+deathNumberInOceania <- data %>%
+  filter(region=="Oceania") %>%
+  group_by(Year) %>%
+  summarise(death_numbers=sum(`Death Numbers`, na.rm = TRUE)) %>%
+  mutate(divide_per_one_million=death_numbers / 1000);
+
+deathNumberInOceania %>%
+  ggplot() + 
+  aes(x = Year, y = divide_per_one_million) +
+  geom_line(stat = "identity", width = 0.5) +
+  labs(
+    title = "Evolution du nombre de décès en Océanie",
+    x = "Années",
+    y = "Nombre de décès (en milliers)"
+  );
+```
+
+# SUMMURIZE ALL
+```{r}
+sumEuropePopulation <- data %>% filter(region=="Europe") %>%
+  distinct(Entity,Year,population) %>%
+  group_by(Year) %>%
+  summarise(population=sum(population, na.rm = TRUE) / 100000000);
+
+sumEuropeGdP <- data %>% filter(region=="Europe") %>%
+  distinct(Entity,Year,gdp) %>%
+  group_by(Year) %>%
+  summarise(gdp=sum(gdp, na.rm = TRUE) / 10);
+
+sumEuropeDeaths <- data %>%
+  filter(region=="Europe") %>% 
+  group_by(Year) %>%
+  summarise(death_numbers=sum(`Death Numbers`, na.rm = TRUE) / 1000000);
+
+
+
+europeData <- left_join(sumEuropePopulation, sumEuropeGdP, by=c("Year"="Year")) %>%
+  left_join(sumEuropeDeaths, by=c("Year"="Year"));
+```
+
+## Graphique Europe
+
+```{r}
+europeData %>%
+  ggplot(aes(x=Year)) + 
+  geom_line(aes(y = death_numbers), stat = "identity", width = 0.5) +
+  geom_line(aes(y = population), stat = "identity", width = 0.5)+
+  scale_y_continuous(
+    name = "Nombre de décès en millions",
+    sec.axis = sec_axis(~., name="population en centaine de millions"),
+  )
+  
+```
+
+```{r}
+scale_europe = scale(europeData[,-1], center = T,scale = T)
+year= as.data.frame(seq(1990,2019,by=1))
+scale_euro=cbind(year,scale_europe)
+```
+
+
+```{r}
+scale_euro=as.data.frame(scale_euro)
+scale_euro %>% 
+  rename(Year=`seq(1990, 2019, by = 1)`) %>% 
+  ggplot(aes(x=Year), mapping) + 
+  geom_line(aes(y = death_numbers), col='red', stat = "identity", width = 1) +
+  geom_line(aes(y = population), col='blue',stat = "identity", width = 1)+
+  geom_line(aes(y = gdp), col='green',stat = "identity", width = 1) 
+```
+
