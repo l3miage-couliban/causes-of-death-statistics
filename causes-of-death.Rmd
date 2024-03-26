@@ -69,7 +69,7 @@ data <- left_join(CausesData, CountriesData, by=c("iso_code"="iso_code", "Year"=
   
 ```{r}
 ndc <- data %>%
-  filter(!is.na(Code)) %>%
+  filter(!is.na(iso_code)) %>%
   filter(!is.na(`Death Numbers`)) %>%
   group_by(`Causes name`) %>%
   summarize(`Death Numbers`=sum(as.numeric(`Death Numbers`))) %>%
@@ -79,7 +79,107 @@ ndc <- data %>%
 
 ## 5 firsts causes of death on each continent
 ```{r}
-area <- data %>%
-  filter(is.na(Code))
-  filter(Entity="")
+
+asian_data <- data %>%
+  filter(region == "Asia") %>%
+  group_by(Year) %>%
+  summarise(
+    total_deaths = sum(`Death Numbers`, na.rm = TRUE), # Sum of deaths, removing NAs
+    total_population = sum(population, na.rm = TRUE) # Sum of population, removing NAs
+  )
+
+# Now, plot the total_population over time
+ggplot(data = asian_data, aes(x = Year, y = total_population)) +
+  geom_line() +
+  theme_minimal() +
+  labs(title = "Population Evolution in Asia", x = "Year", y = "Total Population")
+
 ```
+
+```{r}
+americas_data <- data %>%
+  filter(region == "Americas") %>%
+  group_by(Year) %>%
+  summarise(
+    total_deaths = sum(`Death Numbers`, na.rm = TRUE), # Sum of deaths, removing NAs
+    total_population = sum(population, na.rm = TRUE) # Sum of population, removing NAs
+  )
+
+# Now, plot the total_population over time
+ggplot(data = americas_data, aes(x = Year, y = total_population)) +
+  geom_line() +
+  theme_minimal() +
+  labs(title = "Population Evolution in Americas", x = "Year", y = "Total Population")
+```
+```{r}
+
+Europe_data <- data %>%
+  filter(region == "Europe") %>%
+  group_by(Year) %>%
+  summarise(
+    total_deaths = sum(`Death Numbers`, na.rm = TRUE), # Sum of deaths, removing NAs
+    total_population = sum(population, na.rm = TRUE) # Sum of population, removing NAs
+  )
+
+# Now, plot the total_population over time
+ggplot(data = Europe_data, aes(x = Year, y = total_population)) +
+  geom_line() +
+  theme_minimal() +
+  labs(title = "Population Evolution in Europe", x = "Year", y = "Total Population")
+```
+
+```{r}
+
+Africa_data <- data %>%
+  filter(region == "Africa") %>%
+  group_by(Year) %>%
+  summarise(
+    total_deaths = sum(`Death Numbers`, na.rm = TRUE), # Sum of deaths, removing NAs
+    total_population = sum(population, na.rm = TRUE) # Sum of population, removing NAs
+  )
+
+# Now, plot the total_population over time
+ggplot(data = Africa_data, aes(x = Year, y = total_population)) +
+  geom_line() +
+  theme_minimal() +
+  labs(title = "Population Evolution in Africa", x = "Year", y = "Total Population")
+```
+
+```{r}
+Oceania_data <- data %>%
+  filter(region == "Oceania") %>%
+  group_by(Year) %>%
+  summarise(
+    total_deaths = sum(`Death Numbers`, na.rm = TRUE), # Sum of deaths, removing NAs
+    total_population = sum(population, na.rm = TRUE) # Sum of population, removing NAs
+  )
+
+# Now, plot the total_population over time
+ggplot(data = Oceania_data, aes(x = Year, y = total_population)) +
+  geom_line() +
+  theme_minimal() +
+  labs(title = "Population Evolution in Oceania", x = "Year", y = "Total Population")
+```
+
+
+
+
+```{r}
+
+filtered_data <- data %>%
+  filter(!is.na(region) & !is.na(Year) & !is.na(population))
+
+
+ggplot(data = filtered_data, aes(x = Year, y = `Death Numbers`)) + 
+  geom_line() + 
+  facet_wrap(~ region, scales = "free_y") + 
+  labs(
+    title = "Population Trends by Region",
+    x = "Year",
+    y = "Population"
+  ) +
+  theme_minimal()
+
+
+```
+
