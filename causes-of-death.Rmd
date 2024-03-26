@@ -70,36 +70,41 @@ library(scales)
 region_america <- data %>%
   filter(region == "Americas", Year != 2019)
 gdp_america <- region_america %>%
+  distinct(gdp,Year,Entity)%>%
   group_by(Year) %>%
-  summarise(gdp_total = sum(gdp, na.rm = TRUE)/10000000000)
+  summarise(gdp_total = sum(gdp, na.rm = TRUE)/100000000)
 
 #Africa region et gdp
 region_africa <- data %>%
   filter(region == "Africa", Year != 2019)
 gdp_africa <- region_africa %>%
+  distinct(gdp,Year,Entity)%>%
   group_by(Year) %>%
-  summarise(gdp_total = sum(gdp, na.rm = TRUE)/10000000000)
+  summarise(gdp_total = sum(gdp, na.rm = TRUE)/100000000)
 
 #Asia region et gdp
 region_asia <- data %>%
   filter(region == "Asia",Year != 2019)
 gdp_asia <- region_asia %>%
+  distinct(gdp,Year,Entity)%>%
   group_by(Year) %>%
-  summarise(gdp_total = sum(gdp, na.rm = TRUE)/1000000000)
+  summarise(gdp_total = sum(gdp, na.rm = TRUE)/100000000)
 
 #Europe region et gdp
 region_europe <- data %>%
   filter(region == "Europe",Year != 2019)
 gdp_europe <- region_europe %>%
+  distinct(gdp,Year,Entity)%>%
   group_by(Year) %>%
-  summarise(gdp_total = sum(gdp, na.rm = TRUE)/1000000000)
+  summarise(gdp_total = sum(gdp, na.rm = TRUE)/100000000)
 
 #Oceania region et gdp
 region_oceania <- data %>%
   filter(region == "Oceania",Year != 2019)
 gdp_oceania <- region_oceania %>%
+  distinct(gdp,Year,Entity)%>%
   group_by(Year) %>%
-  summarise(gdp_total = sum(gdp, na.rm = TRUE)/1000000000)
+  summarise(gdp_total = sum(gdp, na.rm = TRUE)/100000000)
 ```
 
 ```{r}
