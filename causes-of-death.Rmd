@@ -33,6 +33,10 @@ D'autres questions pourront être ajoutées au fur et à mesure pour plus de pr�
 library(tidyverse)
 library(maps)
 library(ggplot2)
+library(ggplot2)
+theme_set(
+  theme_bw() 
+  )
 
 CausesData <- read_csv("20222703-causes-f-death-clean-output-v2.0.csv") %>%
   rename(iso_code=Code) %>%
@@ -304,8 +308,10 @@ ggplot(data = RegionAustralia, aes(y = `Causes name`, x = `Death Numbers`, color
 
 
 
-#### Nuages de points
+#### NUAGES DE POINTS
+
 #### Sub-Sahara Africa en 2016
+#### A la sortie de l'épidémie d'Ebola qui a sévi en Afrique de l'Ouest, principalement en Guinée, au Liberia et en #### Sierra Leone, a été l'une des plus graves de l'histoire de la maladie. Elle a également touché d'autres pays de #### la région, bien que dans une moindre mesure.
 ```{r}
 subSahara2015 <- data %>%
 filter(`sub-region` == "Sub-Saharan Africa")  %>%
@@ -337,7 +343,85 @@ ratio_deces_par_cause <- subSahara2015$`Death Numbers` / total_deces
 
 
 ggplot(subSahara2015, aes(x = PIB_total, y = taux_mortalite, shape = `Causes name`, color = ratio_deces_par_cause))+
-  geom_point() +
+  geom_point(position = position_jitter(width = 0.3, height = 0.3), size = 2) +
   labs(x = "PIB total de la sous-région", y = "Taux de mortalité", color = "Ratio de décès par cause") 
 
+```
+
+#### Nuages de points
+#### Western Europe en 2010
+#### 2009 - 2010 une période qui pourrait être considérée comme particulièrement significative en Europe occidentale #### est celle de la pandémie de grippe H1N1 
+```{r}
+westernEurope2010 <- data %>%
+filter(`sub-region` == "Western Europe")  %>%
+group_by(Year)%>%
+filter(!is.na(gdp)) %>%
+filter(Year == 2010) %>%
+filter(!is.na(`Death Numbers`))%>%
+  group_by(`Causes name`) %>%
+  summarize(`Death Numbers`=sum(as.numeric(`Death Numbers`))) %>%
+  arrange(desc(`Death Numbers`))%>%
+  top_n(5);
+
+westernEurope2 <- data %>%
+filter(`sub-region` == "Western Europe")  %>%
+group_by(Year)%>%
+filter(!is.na(gdp)) %>%
+filter(!is.na(`Death Numbers`))%>%
+filter(Year == 2010) %>%
+  distinct(Entity, population, gdp) %>%
+  summarise(PIB = sum(gdp), population = sum(population))
+
+PIB_total <- sum(westernEurope2$PIB) / 1000000000000000
+total_population <- sum(westernEurope2$population)
+total_deces <- sum(westernEurope2010$`Death Numbers`)
+
+taux_mortalite = total_deces / total_population
+
+ratio_deces_par_cause <- westernEurope2010$`Death Numbers` / total_deces
+
+
+ggplot(subSahara2015, aes(x = PIB_total, y = taux_mortalite, shape = `Causes name`, color = ratio_deces_par_cause))+
+  geom_point(position = position_jitter(width = 0.3, height = 0.3), size = 2) +
+  labs(x = "PIB total de la sous-région", y = "Taux de mortalité", color = "Ratio de décès par cause") 
+
+```
+
+#### Nuages de points
+#### Eastern Asia en 2003
+#### Une période qui pourrait être considérée comme particulièrement critique pour l'Asie de l'Est est celle 
+#### de l'épidémie de syndrome respiratoire aigu sévère (SRAS) en 2002-2003. Le SRAS, causé par un coronavirus, a #### émergé en Chine continentale en novembre 2002 avant de se propager rapidement à d'autres pays de la région et #### au-delà.
+```{r}
+easternAsia2003 <- data %>%
+filter(`sub-region` == "Eastern Asia")  %>%
+group_by(Year)%>%
+filter(!is.na(gdp)) %>%
+filter(Year == 2003) %>%
+filter(!is.na(`Death Numbers`))%>%
+  group_by(`Causes name`) %>%
+  summarize(`Death Numbers`=sum(as.numeric(`Death Numbers`))) %>%
+  arrange(desc(`Death Numbers`))%>%
+  top_n(5);
+
+easternAsia2 <- data %>%
+filter(`sub-region` == "Eastern Asia")  %>%
+group_by(Year)%>%
+filter(!is.na(gdp)) %>%
+filter(!is.na(`Death Numbers`))%>%
+filter(Year == 2003) %>%
+  distinct(Entity, population, gdp) %>%
+  summarise(PIB = sum(gdp), population = sum(population))
+
+PIB_total <- sum(easternAsia2$PIB) / 1000000000
+total_population <- sum(easternAsia2$population)
+total_deces <- sum(easternAsia2003$`Death Numbers`) 
+
+taux_mortalite = (total_deces / total_population) 
+
+ratio_deces_par_cause <- (easternAsia2003$`Death Numbers` / total_deces)  
+
+
+ggplot(easternAsia2003, aes(x = PIB_total, y = taux_mortalite, shape = `Causes name`, color = ratio_deces_par_cause))+
+  geom_point(position = position_jitter(width = 0.3, height = 0.3), size = 2) +
+  labs(x = "PIB total de la sous-région en milliards", y = "Taux de mortalité en pourcentage", color = "Ratio de décès par cause") 
 ```
