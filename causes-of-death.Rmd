@@ -27,17 +27,22 @@ Source: https://www.kaggle.com/datasets/ivanchvez/causes-of-death-our-world-in-d
 D'autres questions pourront être ajoutées au fur et à mesure pour plus de précisions et d'interprétations
 
 
-## Read Dataset
+# Read Dataset
 
+## Causes of death
+Les données proviennent de Our World In Data
+Source: https://www.kaggle.com/datasets/ivanchvez/causes-of-death-our-world-in-data
 ```{r}
 library(tidyverse)
+library(ggplot2)
+theme_set(theme_minimal())
 
-CausesData <- read_csv("20222703-causes-f-death-clean-output-v2.0.csv", show_col_types = FALSE) %>%
+CausesData <- read_csv("20222703-causes-f-death-clean-output-v2.0.csv") %>%
   rename(iso_code=Code) %>%
   filter(Year %in% 1990:2019) %>%
   filter(!is.na(iso_code));
 ```
-
+## Countries data
 
 ```{r}
 CountriesData <- read_csv("owid-co2-data.csv") %>%
@@ -46,117 +51,252 @@ CountriesData <- read_csv("owid-co2-data.csv") %>%
   filter(!is.na(iso_code));
 ```
 
+## Countries with their region
+source:  https://github.com/lukes/ISO-3166-Countries-with-Regional-Codes/blob/master/all/all.csv.
+These lists are the result of merging data from two sources, the Wikipedia ISO 3166-1 article for alpha and numeric country codes, and the UN Statistics site for countries' regional, and sub-regional codes. In addition to countries, it includes dependent territories.
+
 ```{r}
 ContinentsData <- read_csv("continents2.csv") %>%
-  select('alpha-3', region) %>%
+  select('alpha-3', region, name) %>%
   rename(iso_code='alpha-3') %>%
   filter(!is.na(region));
 ```
 
-## join both dataframes
+## join dataframes
 ```{r}
 #data <- merge(CausesData, CountriesData, by="iso_code");
 data <- left_join(CausesData, CountriesData, by=c("iso_code"="iso_code", "Year"="year")) %>%
   left_join(ContinentsData, by=c("iso_code"="iso_code")) %>%
-  arrange(Year)
+  arrange(Year);
 ```
 
 
-```{r}
-library(dplyr)
-library(scales)
+## 10 firsts causes of death
 
-#Americas region et gdp
-region_america <- data %>%
-  filter(region == "Americas", Year != 2019)
-gdp_america <- region_america %>%
-  distinct(gdp,Year,Entity)%>%
+  
+```{r}
+ndc <- data %>%
+  filter(!is.na(iso_code)) %>%
+  filter(!is.na(`Death Numbers`)) %>%
+  group_by(`Causes name`) %>%
+  summarize(`Death Numbers`=sum(as.numeric(`Death Numbers`))) %>%
+  arrange(desc(`Death Numbers`)) %>%
+  top_n(10)
+```
+
+
+# COURBE D'EVOLUTION DU NOMBRE DE MORT SUR CHAQUE CONTINENT
+
+```{r}
+sumAfricaPopulation <- data %>% 
+  filter(region=="Africa") %>%
+  distinct(Entity,Year,population) %>%
   group_by(Year) %>%
-  summarise(gdp_total = sum(gdp, na.rm = TRUE)/100000000)
+  summarise(population=sum(population, na.rm = TRUE) / 100000000);
 
-#Africa region et gdp
-region_africa <- data %>%
-  filter(region == "Africa", Year != 2019)
-gdp_africa <- region_africa %>%
-  distinct(gdp,Year,Entity)%>%
+sumAfricaGdP <- data %>% filter(region=="Africa") %>%
+  distinct(Entity,Year,gdp) %>%
   group_by(Year) %>%
-  summarise(gdp_total = sum(gdp, na.rm = TRUE)/100000000)
+  summarise(gdp=sum(gdp, na.rm = TRUE) / 10);
 
-#Asia region et gdp
-region_asia <- data %>%
-  filter(region == "Asia",Year != 2019)
-gdp_asia <- region_asia %>%
-  distinct(gdp,Year,Entity)%>%
+sumAfricaDeaths <- data %>%
+  filter(region=="Africa") %>% 
   group_by(Year) %>%
-  summarise(gdp_total = sum(gdp, na.rm = TRUE)/100000000)
+  summarise(death_numbers=sum(`Death Numbers`, na.rm = TRUE) / 1000000);
 
-#Europe region et gdp
-region_europe <- data %>%
-  filter(region == "Europe",Year != 2019)
-gdp_europe <- region_europe %>%
-  distinct(gdp,Year,Entity)%>%
+
+
+africaData <- left_join(sumAfricaPopulation, sumAfricaGdP, by=c("Year"="Year")) %>%
+  left_join(sumAfricaDeaths, by=c("Year"="Year"));
+
+plotAfrica <- africaData %>%
+  ggplot(aes(x=Year)) + 
+  geom_line(aes(y = death_numbers), stat = "identity", width = 0.5, col='red') +
+  geom_line(aes(y = population), stat = "identity", width = 0.5, col='blue')+
+  scale_y_continuous(
+    name = "Nombre de décès en millions",
+    sec.axis = sec_axis(~., name="population en centaine de millions"),
+  )+
+  scale_x_continuous(breaks = seq(1990, 2019, by = 2))+
+  labs(
+    title = "Evolution de la population et du nombre de décès par année en Afrique"
+  );
+```
+
+```{r}
+sumAmericaPopulation <- data %>% 
+  filter(region=="Americas") %>%
+  distinct(Entity,Year,population) %>%
   group_by(Year) %>%
-  summarise(gdp_total = sum(gdp, na.rm = TRUE)/100000000)
+  summarise(population=sum(population, na.rm = TRUE) / 100000000);
 
-#Oceania region et gdp
-region_oceania <- data %>%
-  filter(region == "Oceania",Year != 2019)
-gdp_oceania <- region_oceania %>%
-  distinct(gdp,Year,Entity)%>%
+sumAmericaGdP <- data %>% filter(region=="Americas") %>%
+  distinct(Entity,Year,gdp) %>%
   group_by(Year) %>%
-  summarise(gdp_total = sum(gdp, na.rm = TRUE)/100000000)
+  summarise(gdp=sum(gdp, na.rm = TRUE) / 10);
+
+sumAmericaDeaths <- data %>%
+  filter(region=="Americas") %>% 
+  group_by(Year) %>%
+  summarise(death_numbers=sum(`Death Numbers`, na.rm = TRUE) / 1000000);
+
+
+
+americaData <- left_join(sumAmericaPopulation, sumAmericaGdP, by=c("Year"="Year")) %>%
+  left_join(sumAmericaDeaths, by=c("Year"="Year"));
+
+plotAmerica <- americaData %>%
+  ggplot(aes(x=Year)) + 
+  geom_line(aes(y = death_numbers), stat = "identity", width = 0.5, col='red') +
+  geom_line(aes(y = population), stat = "identity", width = 0.5, col='blue')+
+  scale_y_continuous(
+    name = "Nombre de décès en millions",
+    sec.axis = sec_axis(~., name="population en centaine de millions"),
+  )+
+  scale_x_continuous(breaks = seq(1990, 2018, by = 2))+
+  labs(
+    title = "Evolution de la population et du nombre de décès par année en Amérique"
+  )
+
 ```
 
 ```{r}
-#Les Graphiques
+sumAsiaPopulation <- data %>% 
+  filter(region=="Asia") %>%
+  distinct(Entity,Year,population) %>%
+  group_by(Year) %>%
+  summarise(population=sum(population, na.rm = TRUE) / 100000000);
 
-#Afrique 
-library(ggplot2)
-ggplot(gdp_africa, aes(x = Year, y = gdp_total)) +
-  geom_line() +
-  labs(x = "Annee", y = "gdp Total", color = "Region") +
-  theme_minimal() +
-  ggtitle("")+
-  scale_x_continuous(breaks = seq(1990, 2018, by = 2))
-```
-```{r}
-#Americas 
-library(ggplot2)
-ggplot(gdp_america, aes(x = Year, y = gdp_total)) +
-  geom_line() +
-  labs(x = "Annee", y = "gdp Total", color = "Region") +
-  theme_minimal() +
-  ggtitle("")+
-  scale_x_continuous(breaks = seq(1990, 2018, by = 2))
-```
-```{r}
-#Oceania
-library(ggplot2)
-ggplot(gdp_oceania, aes(x = Year, y = gdp_total)) +
-  geom_line() +
-  labs(x = "Annee", y = "gdp Total", color = "Region") +
-  theme_minimal() +
-  ggtitle("")+
-  scale_x_continuous(breaks = seq(1990, 2018, by = 2))
-```
-```{r}
-#Europe 
-library(ggplot2)
-ggplot(gdp_europe, aes(x = Year, y = gdp_total)) +
-  geom_line() +
-  labs(x = "Annee", y = "gdp Total", color = "Region") +
-  theme_minimal() +
-  ggtitle("")+
-  scale_x_continuous(breaks = seq(1990, 2018, by = 2))
+sumAsiaGdP <- data %>% filter(region=="Asia") %>%
+  distinct(Entity,Year,gdp) %>%
+  group_by(Year) %>%
+  summarise(gdp=sum(gdp, na.rm = TRUE) / 10);
+
+sumAsiaDeaths <- data %>%
+  filter(region=="Asia") %>% 
+  group_by(Year) %>%
+  summarise(death_numbers=sum(`Death Numbers`, na.rm = TRUE) / 1000000);
+
+
+
+asiaData <- left_join(sumAsiaPopulation, sumAsiaGdP, by=c("Year"="Year")) %>%
+  left_join(sumAsiaDeaths, by=c("Year"="Year"));
+
+plotAsia <- asiaData %>%
+  ggplot(aes(x=Year)) + 
+  geom_line(aes(y = death_numbers), stat = "identity", width = 0.5, col='red') +
+  geom_line(aes(y = population), stat = "identity", width = 0.5, col='blue')+
+  scale_y_continuous(
+    name = "Nombre de décès en millions",
+    sec.axis = sec_axis(~., name="population en centaine de millions"),
+  )+
+  scale_x_continuous(breaks = seq(1990, 2018, by = 2))+
+  labs(
+    title = "Evolution de la population et du nombre de décès par année en Asie"
+  )
+plotAsia
 ```
 
+
 ```{r}
-#Asia
-library(ggplot2)
-ggplot(gdp_asia, aes(x = Year, y = gdp_total)) +
-  geom_line() +
-  labs(x = "Annee", y = "gdp Total", color = "Region") +
-  theme_minimal() +
-  ggtitle("")+
-  scale_x_continuous(breaks = seq(1990, 2018, by = 2))
+sumOceaniaPopulation <- data %>% 
+  filter(region=="Oceania") %>%
+  distinct(Entity,Year,population) %>%
+  group_by(Year) %>%
+  summarise(population=sum(population, na.rm = TRUE) / 100000000);
+
+sumOceaniaGdP <- data %>% filter(region=="Oceania") %>%
+  distinct(Entity,Year,gdp) %>%
+  group_by(Year) %>%
+  summarise(gdp=sum(gdp, na.rm = TRUE) / 10);
+
+sumOceaniaDeaths <- data %>%
+  filter(region=="Oceania") %>% 
+  group_by(Year) %>%
+  summarise(death_numbers=sum(`Death Numbers`, na.rm = TRUE) / 1000000);
+
+
+
+oceaniaData <- left_join(sumOceaniaPopulation, sumOceaniaGdP, by=c("Year"="Year")) %>%
+  left_join(sumOceaniaDeaths, by=c("Year"="Year"));
+
+plotOceania <- oceaniaData %>%
+  ggplot(aes(x=Year)) + 
+  geom_line(aes(y = death_numbers), stat = "identity", width = 0.5, col='red') +
+  geom_line(aes(y = population), stat = "identity", width = 0.5, col='blue')+
+  scale_y_continuous(
+    name = "Nombre de décès en millions",
+    sec.axis = sec_axis(~., name="population en centaine de millions"),
+  )+
+  scale_x_continuous(breaks = seq(1990, 2018, by = 2)) +
+  labs(
+    title = "Evolution de la population et du nombre de décès par année en Océanie"
+  )
 ```
+
+# IN EUROPE
+```{r}
+sumEuropePopulation <- data %>% 
+  filter(region=="Europe") %>%
+  distinct(Entity,Year,population) %>%
+  group_by(Year) %>%
+  summarise(population=sum(population, na.rm = TRUE) / 100000000);
+
+sumEuropeGdP <- data %>% filter(region=="Europe") %>%
+  distinct(Entity,Year,gdp) %>%
+  group_by(Year) %>%
+  summarise(gdp=sum(gdp, na.rm = TRUE) / 10);
+
+sumEuropeDeaths <- data %>%
+  filter(region=="Europe") %>% 
+  group_by(Year) %>%
+  summarise(death_numbers=sum(`Death Numbers`, na.rm = TRUE) / 1000000);
+
+
+
+europeData <- left_join(sumEuropePopulation, sumEuropeGdP, by=c("Year"="Year")) %>%
+  left_join(sumEuropeDeaths, by=c("Year"="Year"));
+
+plotEurope <- europeData %>%
+  ggplot(aes(x=Year)) + 
+  geom_line(aes(y = death_numbers ), stat = "identity", width = 0.5, col='red') +
+  geom_line(aes(y = population ), stat = "identity", width = 0.5, col='blue')+
+  scale_y_continuous(
+    name = "Nombre de décès en millions",
+    sec.axis = sec_axis(~., name="population en centaine de millions"),
+  )+
+  scale_x_continuous(breaks = seq(1990, 2018, by = 2))+
+  labs(
+    title = "Evolution de la population et du nombre de décès par année en Europe"
+  )
+```
+
+
+```{r}
+scale_europe = scale(europeData[,-1], center = T,scale = T)
+year= as.data.frame(seq(1990,2019,by=1))
+scale_euro=cbind(year,scale_europe)
+```
+
+
+```{r}
+scale_euro=as.data.frame(scale_euro)
+scale_euro %>% 
+  rename(Year=`seq(1990, 2019, by = 1)`) %>% 
+  ggplot(aes(x=Year), mapping) + 
+  geom_line(aes(y = death_numbers), col='red', stat = "identity", width = 1) +
+  geom_line(aes(y = population), col='blue',stat = "identity", width = 1)+
+  geom_line(aes(y = gdp), col='green',stat = "identity", width = 1) 
+```
+
+
+```{r}
+library(ggplot2)
+library(patchwork)
+
+grid_plots = plotAfrica + plotAmerica + plotAsia + plotOceania + plotEurope + 
+  plot_layout(ncol = 2)
+grid_plots
+
+```
+
