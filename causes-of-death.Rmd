@@ -476,5 +476,47 @@ ggplot(RegionNorthernAmerica , aes(x=`Causes name`, y=Death_numbers, fill=`Cause
 
 ```
 
+### Des décès par année et GDP pour 'Central Asia'
 
+```{r}
+data_asie_centrale <- data %>%
+  filter(!is.na(gdp), !is.na(`Death Numbers`)) %>%
+  filter(`sub-region` == "Central Asia") %>%
+  group_by(Year, Entity) %>%
+  summarise(Total_Deaths = sum(`Death Numbers`), GDP = unique(gdp)) %>%
+  group_by(Year) %>%
+  summarise(Total_Deaths = sum(Total_Deaths), Total_GDP = (sum(GDP)))
+
+
+p <- ggplot(data = data_asie_centrale, aes(x = Year, y = Total_Deaths, fill = Total_GDP)) +
+  geom_bar(stat = "identity") +
+ scale_fill_viridis_c(option = "plasma", begin = 0.3, end = 0.9) + # Utilise l'échelle de couleur viridis
+  labs(
+    title = "Total des décès par année et GDP\npour Central Asia", # Titre du graphique
+    y = "Total des décès",
+    x = "Année",
+    fill = "GDP ($)"
+  ) +
+  theme_minimal(base_size = 22) +
+  scale_x_continuous(breaks = seq(min(data_asie_centrale$Year), max(data_asie_centrale$Year), by = 5)) + 
+  theme(text = element_text(size = 22), # Taille de la police globale
+        plot.title = element_text(size = rel(0.8), face = "bold"),
+        axis.title.x = element_text(size = rel(1.2)),
+        axis.title.y = element_text(size = rel(1.2)),
+        legend.title = element_text(size = rel(0.8)),
+        legend.text = element_text(size = rel(1)),
+        axis.text.x = element_text(size = rel(0.7)),
+    axis.text.y = element_text(size = rel(1)) )
+
+# Formater les légendes du graphique
+p <- p + guides(color = guide_colourbar(
+  title = "GDP ($)",
+  label.position = "left",
+  barwidth = 2,
+  barheight = 10,
+  label.theme = element_text(size = 20)
+))
+
+p
+```
 
