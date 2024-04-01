@@ -31,6 +31,8 @@ D'autres questions pourront être ajoutées au fur et à mesure pour plus de pr�
 
 ```{r}
 library(tidyverse)
+library(maps)
+library(ggplot2)
 
 CausesData <- read_csv("20222703-causes-f-death-clean-output-v2.0.csv") %>%
   rename(iso_code=Code) %>%
@@ -48,9 +50,11 @@ CountriesData <- read_csv("owid-co2-data.csv") %>%
 
 ```{r}
 ContinentsData <- read_csv("continents2.csv") %>%
-  select('alpha-3', region) %>%
+  select('alpha-3', region, 'sub-region') %>%
   rename(iso_code='alpha-3') %>%
   filter(!is.na(region));
+nbSousRegion <- ContinentsData %>%
+  distinct(`sub-region`)
 ```
 
 ## join both dataframes
@@ -85,58 +89,6 @@ area <- data %>%
 ```
 
 #### MES MODIFICATIONS
-
-## L'évolution de la Population en fonction des Continents
-
-## Africa
-```{r}
-africa <- data %>%
-filter(region == "Africa")  %>%
-group_by(Year) %>%
-distinct(population, Entity) %>%
-summarise(populationTotal = sum(population))
-ggplot(data  = africa, shape = populationTotal) +
-  aes(x = Year) +
-  aes(y = populationTotal / 10000000) +
-  aes(color = populationTotal) +
-  geom_line() +
-  scale_x_continuous(breaks = seq(1990,2019, by = 2))
-
-```
-  
-## America
-```{r}
-america <- data %>%
-filter(region == "Americas")  %>%
-group_by(Year) %>%
-distinct(population, Entity) %>%
-summarise(populationTotal = sum(population))
-ggplot(data  = america, shape = populationTotal) +
-  aes(x = Year) +
-  aes(y = populationTotal / 10000000) +
-  aes(color = populationTotal) +
-  geom_line() +
-  scale_x_continuous(breaks = seq(1990,2019, by = 2))
-
-```
-
-
-## Europe
-```{r}
-europe <- data %>%
-filter(region == "Europe")  %>%
-group_by(Year) %>%
-distinct(population, Entity) %>%
-filter(!is.na(population)) %>%
-summarise(populationTotal = sum(population))
-ggplot(data  = europe, shape = populationTotal) +
-  aes(x = Year) +
-  aes(y = populationTotal ) +
-  aes(color = populationTotal) +
-  geom_line() +
-  scale_x_continuous(breaks = seq(1990,2019, by = 2))
-
-```
 ## Asia
 ```{r}
 asia <- data %>%
@@ -153,3 +105,239 @@ ggplot(data  = asia, shape = populationTotal) +
 
 ```
 
+```{r}
+# Charger les données pour le monde
+world <- map_data("world") 
+
+
+# Fusionner les données de population avec les données de la carte du monde en utilisant un left join
+
+pays <- data %>% distinct(Entity)
+world_with_population <- merge(pays, world, by.x = "Entity", by.y = "region", all.x = TRUE)
+
+# Créer la carte
+ggplot() + 
+  geom_polygon(data = world, aes(x = long, y = lat, group = group), 
+               fill = "lightblue", color = "black")
+
+
+
+```
+
+##### DONNÉES DES SOUS REGIONS ################################
+#### Region Sub-Sahara Africa
+
+```{r}
+RegionSubSaharaAfrica <- data %>%
+  filter(!is.na(iso_code)) %>%
+  filter(!is.na(`Death Numbers`)) %>%
+  filter(`sub-region`=="Sub-Saharan Africa") %>%
+  group_by(`Causes name`) %>%
+  summarize(`Death Numbers`=sum(as.numeric(`Death Numbers`)) / 1000000) %>%
+  arrange(desc(`Death Numbers`)) %>%
+  top_n(6)
+ggplot(data = RegionSubSaharaAfrica, aes(y = `Causes name`, x = `Death Numbers`, color = `Causes name`)) +
+  geom_bar(stat = "identity", fill = "white") +
+  labs(y = "Cause de mortalité", x = "Nombre de décès en millions", title = "Nombre de décès par cause de mortalité") 
+```
+
+#### Region Northen Africa
+```{r}
+RegionNorthenAfrica <- data %>%
+  filter(!is.na(iso_code)) %>%
+  filter(!is.na(`Death Numbers`)) %>%
+  filter(`sub-region`=="Northern Africa") %>%
+  group_by(`Causes name`) %>%
+  summarize(`Death Numbers`=sum(as.numeric(`Death Numbers`)) / 1000000) %>%
+  arrange(desc(`Death Numbers`)) %>%
+  top_n(5)
+ggplot(data = RegionNorthenAfrica, aes(y = `Causes name`, x = `Death Numbers`, color = `Causes name`)) +
+  geom_bar(stat = "identity", fill = "white") +
+  labs(y = "Cause de mortalité", x = "Nombre de décès en millions", title = "Nombre de décès par cause de mortalité") 
+```
+#### Region Western Europe
+```{r}
+RegionWesternEurope <- data %>%
+  filter(!is.na(iso_code)) %>%
+  filter(!is.na(`Death Numbers`)) %>%
+  filter(`sub-region`=="Western Europe") %>%
+  group_by(`Causes name`) %>%
+  summarize(`Death Numbers`=sum(as.numeric(`Death Numbers`)) / 1000000) %>%
+  arrange(desc(`Death Numbers`)) %>%
+  top_n(5)
+ggplot(data = RegionWesternEurope, aes(y = `Causes name`, x = `Death Numbers`, color = `Causes name`)) +
+  geom_bar(stat = "identity", fill = "white") +
+  labs(y = "Cause de mortalité", x = "Nombre de décès en millions", title = "Nombre de décès par cause de mortalité")
+```
+#### Region Northen Europe
+```{r}
+RegionNorthenEurope <- data %>%
+  filter(!is.na(iso_code)) %>%
+  filter(!is.na(`Death Numbers`)) %>%
+  filter(`sub-region`=="Northern Europe") %>%
+  group_by(`Causes name`) %>%
+  summarize(`Death Numbers`=sum(as.numeric(`Death Numbers`)) / 1000000) %>%
+  arrange(desc(`Death Numbers`)) %>%
+  top_n(5)
+ggplot(data = RegionNorthenEurope, aes(y = `Causes name`, x = `Death Numbers`, color = `Causes name`)) +
+  geom_bar(stat = "identity", fill = "white") +
+  labs(y = "Cause de mortalité", x = "Nombre de décès en millions", title = "Nombre de décès par cause de mortalité")
+```
+
+#### Region Southern Asia
+```{r}
+RegionSouthernAsia <- data %>%
+  filter(!is.na(iso_code)) %>%
+  filter(!is.na(`Death Numbers`)) %>%
+  filter(`sub-region`=="Southern Asia") %>%
+  group_by(`Causes name`) %>%
+  summarize(`Death Numbers`=sum(as.numeric(`Death Numbers`)) /1000000) %>%
+  arrange(desc(`Death Numbers`)) %>%
+  top_n(5)
+ggplot(data = RegionSouthernAsia, aes(y = `Causes name`, x = `Death Numbers`, color = `Causes name`)) +
+  geom_bar(stat = "identity", fill = "white") +
+  labs(y = "Cause de mortalité", x = "Nombre de décès en millions", title = "Nombre de décès par cause de mortalité")
+```
+
+#### Region Western Asia
+```{r}
+RegionWesternAsia <- data %>%
+  filter(!is.na(iso_code)) %>%
+  filter(!is.na(`Death Numbers`)) %>%
+  filter(`sub-region`=="Western Asia") %>%
+  group_by(`Causes name`) %>%
+  summarize(`Death Numbers`=sum(as.numeric(`Death Numbers`)) / 1000000) %>%
+  arrange(desc(`Death Numbers`)) %>%
+  top_n(5)
+ggplot(data = RegionWesternAsia, aes(y = `Causes name`, x = `Death Numbers`, color = `Causes name`)) +
+  geom_bar(stat = "identity", fill = "white") +
+  labs(y = "Cause de mortalité", x = "Nombre de décès en millions", title = "Nombre de décès par cause de mortalité")
+```
+
+#### Region South-eastern Asia
+```{r}
+RegionSouthEasternAsia <- data %>%
+  filter(!is.na(iso_code)) %>%
+  filter(!is.na(`Death Numbers`)) %>%
+  filter(`sub-region`=="South-eastern Asia") %>%
+  group_by(`Causes name`) %>%
+  summarize(`Death Numbers`=sum(as.numeric(`Death Numbers`)) / 1000000) %>%
+  arrange(desc(`Death Numbers`)) %>%
+  top_n(5)
+ggplot(data = RegionSouthEasternAsia, aes(y = `Causes name`, x = `Death Numbers`, color = `Causes name`)) +
+  geom_bar(stat = "identity", fill = "white") +
+  labs(y = "Cause de mortalité", x = "Nombre de décès en millions", title = "Nombre de décès par cause de mortalité")
+```
+#### Region Eastern Asia
+```{r}
+RegionEasternAsia <- data %>%
+  filter(!is.na(iso_code)) %>%
+  filter(!is.na(`Death Numbers`)) %>%
+  filter(`sub-region`=="Eastern Asia") %>%
+  group_by(`Causes name`) %>%
+  summarize(`Death Numbers`=sum(as.numeric(`Death Numbers`)) / 1000000) %>%
+  arrange(desc(`Death Numbers`)) %>%
+  top_n(6)
+ggplot(data = RegionEasternAsia, aes(y = `Causes name`, x = `Death Numbers`, color = `Causes name`)) +
+  geom_bar(stat = "identity") +
+  labs(y = "Cause de mortalité", x = "Nombre de décès en millions", title = "Nombre de décès par cause de mortalité")
+```
+#### Region Central Asia
+```{r}
+RegionCentralAsia <- data %>%
+  filter(!is.na(iso_code)) %>%
+  filter(!is.na(`Death Numbers`)) %>%
+  filter(`sub-region`=="Central Asia") %>%
+  group_by(`Causes name`) %>%
+  summarize(`Death Numbers`=sum(as.numeric(`Death Numbers`)/1000000)) %>%
+  arrange(desc(`Death Numbers`)) %>%
+  top_n(6)
+ggplot(data = RegionCentralAsia, aes(y = `Causes name`, x = `Death Numbers`, color = `Causes name`)) +
+  geom_bar(stat = "identity", fill = "white") +
+  labs(y = "Cause de mortalité", x = "Nombre de décès en millions", title = "Nombre de décès par cause de mortalité")
+```
+#### Region Latin America and the Caribbean
+```{r}
+RegionLatinAmericaCaribbean <- data %>%
+  filter(!is.na(iso_code)) %>%
+  filter(!is.na(`Death Numbers`)) %>%
+  filter(`sub-region`=="Latin America and the Caribbean") %>%
+  group_by(`Causes name`) %>%
+  summarize(`Death Numbers`=sum(as.numeric(`Death Numbers`))/ 1000000) %>%
+  arrange(desc(`Death Numbers`)) %>%
+  top_n(6)
+ggplot(data = RegionLatinAmericaCaribbean, aes(y = `Causes name`, x = `Death Numbers`, color = `Causes name`)) +
+  geom_bar(stat = "identity", fill = "white") +
+  labs(y = "Cause de mortalité", x = "Nombre de décès en millions", title = "Nombre de décès par cause de mortalité")
+```
+
+#### Region Northern America
+```{r}
+RegionNorthernAmerica <- data %>%
+  filter(!is.na(iso_code)) %>%
+  filter(!is.na(`Death Numbers`)) %>%
+  filter(`sub-region`=="Northern America") %>%
+  group_by(`Causes name`) %>%
+  summarize(`Death Numbers`=sum(as.numeric(`Death Numbers`))/1000000) %>%
+  arrange(desc(`Death Numbers`)) %>%
+  top_n(5)
+ggplot(data = RegionNorthernAmerica, aes(y = `Causes name`, x = `Death Numbers`, color = `Causes name`)) +
+  geom_bar(stat = "identity", fill = "white") +
+  labs(y = "Cause de mortalité", x = "Nombre de décès en millions", title = "Nombre de décès par cause de mortalité")
+```
+
+#### Region Australia and New Zealand
+```{r}
+RegionAustralia <- data %>%
+  filter(!is.na(iso_code)) %>%
+  filter(!is.na(`Death Numbers`)) %>%
+  filter(`sub-region`=="Australia and New Zealand") %>%
+  group_by(`Causes name`) %>%
+  summarize(`Death Numbers`=sum(as.numeric(`Death Numbers`))) %>%
+  arrange(desc(`Death Numbers`)) %>%
+  top_n(5)
+ggplot(data = RegionAustralia, aes(y = `Causes name`, x = `Death Numbers`, color = `Causes name`)) +
+  geom_bar(stat = "identity", fill = "white") +
+  labs(y = "Cause de mortalité", x = "Nombre de décès", title = "Nombre de décès par cause de mortalité") +
+  theme(axis.text.x = element_text(angle = 5, hjust = 1))
+```
+
+
+
+#### Nuages de points
+#### Sub-Sahara Africa en 2016
+```{r}
+subSahara2015 <- data %>%
+filter(`sub-region` == "Sub-Saharan Africa")  %>%
+group_by(Year)%>%
+filter(!is.na(gdp)) %>%
+filter(Year == 2015) %>%
+filter(!is.na(`Death Numbers`))%>%
+  group_by(`Causes name`) %>%
+  summarize(`Death Numbers`=sum(as.numeric(`Death Numbers`))) %>%
+  arrange(desc(`Death Numbers`))%>%
+  top_n(5);
+
+subSahara2 <- data %>%
+filter(`sub-region` == "Sub-Saharan Africa")  %>%
+group_by(Year)%>%
+filter(!is.na(gdp)) %>%
+filter(!is.na(`Death Numbers`))%>%
+filter(Year == 2015) %>%
+  distinct(Entity, population, gdp) %>%
+  summarise(PIB = sum(gdp), population = sum(population))
+
+PIB_total <- sum(subSahara2$PIB) / 1000000000000000
+total_population <- sum(subSahara2$population)
+total_deces <- sum(subSahara2015$`Death Numbers`)
+
+taux_mortalite = total_deces / total_population
+
+ratio_deces_par_cause <- subSahara2015$`Death Numbers` / total_deces
+
+
+ggplot(subSahara2015, aes(x = PIB_total, y = taux_mortalite, shape = `Causes name`, color = ratio_deces_par_cause))+
+  geom_point() +
+  labs(x = "PIB total de la sous-région", y = "Taux de mortalité", color = "Ratio de décès par cause") 
+
+```
