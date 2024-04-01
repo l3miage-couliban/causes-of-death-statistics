@@ -145,18 +145,12 @@ sumAmericaDeaths <- data %>%
 americaData <- left_join(sumAmericaPopulation, sumAmericaGdP, by=c("Year"="Year")) %>%
   left_join(sumAmericaDeaths, by=c("Year"="Year"));
 
-plotAmerica <- americaData %>%
-  ggplot(aes(x=Year)) + 
-  geom_line(aes(y = death_numbers), stat = "identity", width = 0.5, col='red') +
-  geom_line(aes(y = population), stat = "identity", width = 0.5, col='blue')+
-  scale_y_continuous(
-    name = "Nombre de décès en millions",
-    sec.axis = sec_axis(~., name="population en centaine de millions"),
-  )+
-  scale_x_continuous(breaks = seq(1990, 2018, by = 2))+
-  labs(
-    title = "Evolution de la population et du nombre de décès par année en Amérique"
-  )
+plotAmerica <- ggplot(americaData, aes(x = Year)) + 
+  geom_line(aes(y = death_numbers, color = "Deaths"), size = 0.5) +
+  geom_line(aes(y = population, color = "Population"), size = 0.5) +
+  scale_color_manual(values = c("Deaths" = "red", "Population" = "blue")) +
+  labs(color = "Title", title = "Evolution de la population et du nombre de décès par année en Amérique")+
+  scale_x_continuous(breaks = seq(1990, 2018, by = 2))
 
 ```
 
@@ -182,19 +176,13 @@ sumAsiaDeaths <- data %>%
 asiaData <- left_join(sumAsiaPopulation, sumAsiaGdP, by=c("Year"="Year")) %>%
   left_join(sumAsiaDeaths, by=c("Year"="Year"));
 
-plotAsia <- asiaData %>%
-  ggplot(aes(x=Year)) + 
-  geom_line(aes(y = death_numbers), stat = "identity", width = 0.5, col='red') +
-  geom_line(aes(y = population), stat = "identity", width = 0.5, col='blue')+
-  scale_y_continuous(
-    name = "Nombre de décès en millions",
-    sec.axis = sec_axis(~., name="population en centaine de millions"),
-  )+
-  scale_x_continuous(breaks = seq(1990, 2018, by = 2))+
-  labs(
-    title = "Evolution de la population et du nombre de décès par année en Asie"
-  )
-plotAsia
+
+plotAsia <- ggplot(asiaData, aes(x = Year)) + 
+  geom_line(aes(y = death_numbers, color = "Deaths"), size = 0.5) +
+  geom_line(aes(y = population, color = "Population"), size = 0.5) +
+  scale_color_manual(values = c("Deaths" = "red", "Population" = "blue")) +
+  labs(color = "Title", title = "Evolution de la population et du nombre de décès par année en Asie")+
+  scale_x_continuous(breaks = seq(1990, 2018, by = 2))
 ```
 
 
@@ -220,22 +208,19 @@ sumOceaniaDeaths <- data %>%
 oceaniaData <- left_join(sumOceaniaPopulation, sumOceaniaGdP, by=c("Year"="Year")) %>%
   left_join(sumOceaniaDeaths, by=c("Year"="Year"));
 
-plotOceania <- oceaniaData %>%
-  ggplot(aes(x=Year)) + 
-  geom_line(aes(y = death_numbers), stat = "identity", width = 0.5, col='red') +
-  geom_line(aes(y = population), stat = "identity", width = 0.5, col='blue')+
-  scale_y_continuous(
-    name = "Nombre de décès en millions",
-    sec.axis = sec_axis(~., name="population en centaine de millions"),
-  )+
-  scale_x_continuous(breaks = seq(1990, 2018, by = 2)) +
-  labs(
-    title = "Evolution de la population et du nombre de décès par année en Océanie"
-  )
+plotOceania <- ggplot(oceaniaData, aes(x = Year)) + 
+  geom_line(aes(y = death_numbers, color = "Deaths"), size = 0.5) +
+  geom_line(aes(y = population, color = "Population"), size = 0.5) +
+  scale_color_manual(values = c("Deaths" = "red", "Population" = "blue")) +
+  labs(color = "Title", title = "Evolution de la population et du nombre de décès par année en Océanie")+
+  scale_x_continuous(breaks = seq(1990, 2018, by = 2))
 ```
 
 # IN EUROPE
 ```{r}
+library(ggplot2)
+library(tidyverse)
+
 sumEuropePopulation <- data %>% 
   filter(region=="Europe") %>%
   distinct(Entity,Year,population) %>%
@@ -257,18 +242,12 @@ sumEuropeDeaths <- data %>%
 europeData <- left_join(sumEuropePopulation, sumEuropeGdP, by=c("Year"="Year")) %>%
   left_join(sumEuropeDeaths, by=c("Year"="Year"));
 
-plotEurope <- europeData %>%
-  ggplot(aes(x=Year)) + 
-  geom_line(aes(y = death_numbers ), stat = "identity", width = 0.5, col='red') +
-  geom_line(aes(y = population ), stat = "identity", width = 0.5, col='blue')+
-  scale_y_continuous(
-    name = "Nombre de décès en millions",
-    sec.axis = sec_axis(~., name="population en centaine de millions"),
-  )+
-  scale_x_continuous(breaks = seq(1990, 2018, by = 2))+
-  labs(
-    title = "Evolution de la population et du nombre de décès par année en Europe"
-  )
+plotEurope <- ggplot(europeData, aes(x = Year)) + 
+  geom_line(aes(y = death_numbers, color = "Deaths"), size = 0.5) +
+  geom_line(aes(y = population, color = "Population"), size = 0.5) +
+  scale_color_manual(values = c("Deaths" = "red", "Population" = "blue")) +
+  labs(color = "Title", title = "Evolution de la population et du nombre de décès par année en Europe")+
+  scale_x_continuous(breaks = seq(1990, 2018, by = 2))
 ```
 
 
@@ -294,9 +273,19 @@ scale_euro %>%
 library(ggplot2)
 library(patchwork)
 
+# adjuste les themas individuelle
+plotAfrica <- plotAfrica + theme_minimal(base_size = 5)
+plotAmerica <- plotAmerica + theme_minimal(base_size = 5)
+plotAsia <- plotAsia + theme_minimal(base_size = 5)
+plotOceania <- plotOceania + theme_minimal(base_size = 5)
+plotEurope <- plotEurope + theme_minimal(base_size = 5)
+
 grid_plots = plotAfrica + plotAmerica + plotAsia + plotOceania + plotEurope + 
   plot_layout(ncol = 2)
+
+
 grid_plots
+
 
 ```
 
