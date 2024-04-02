@@ -75,7 +75,6 @@ data <- left_join(CausesData, CountriesData, by=c("iso_code"="iso_code", "Year"=
 ```
 
 
-
 # Représentation sur la carte géographique des Décès en million par cause et par année
 ```{r}
 world_data <- ggplot2::map_data('world')
@@ -665,4 +664,4 @@ ggplot(easternAsia2003, aes(x = PIB_total, y = taux_mortalite, shape = `Causes n
 
 
 # Bilan
-Au terme de cette analyse, nous constatons diverses causes de Décès en million à travers le monde. Cela peut être dû au climat, aux habitudes qu'elles soient comportementales ou alimentaires. La cause qui revient le plus souvent est celle des maladies cardiovasculaires. Nous observons également le maintien de l'écart entre la démographie en centaine de millions et les décès en million dans une région, c'est à dire plus la population augmente, plus le nombre de Décès en million augmente.
+Au terme de cette analyse, nous constatons diverses causes de Décès en million à travers le monde. Cela peut être dû au climat, aux habitudes qu'elles soient comportementales ou alimentaires. La cause qui revient le plus souvent est celle des maladies cardiovasculaires, cela s'explique par plusieurs raisons en fonction des sous régions entre-autres: Le vieillissement de la population, Urbanisation et changements de mode de vie (une alimentation riche en graisses et en sucres dans les zones urbaines), accès inégal aux soins de santé. Nous observons également le maintien de l'écart entre la démographie en centaine de millions et les décès en million dans une région, c'est à dire plus la population augmente, plus le nombre de Décès en million augmente.
