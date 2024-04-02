@@ -545,6 +545,8 @@ plotWesternAsia
 ```
 
 # Nuages de point
+Ces nuages de point représentent en abscisse le PIB d'une sous-region, en ordonnée le taux de mortalité à une date donnée. Les formes des points représentent les causes de mortalité et la couleur le ratio de décès par cause. 
+
 ## Sub-Sahara Africa en 2016
 A la sortie de l'épidémie d'Ebola qui a sévi en Afrique de l'Ouest, principalement en Guinée, au Liberia et en ####Sierra Leone, a été l'une des plus graves de l'histoire de la maladie. Elle a également touché d'autres pays de ####la région, bien que dans une moindre mesure.
 ```{r}
