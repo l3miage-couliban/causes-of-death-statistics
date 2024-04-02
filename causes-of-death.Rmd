@@ -13,7 +13,8 @@ output:
   analyse, nous avons defini des questions sur lesquelles travailler:
   1) Représentation sur carte graphique des décès en fonction des Causes et par année
   2) Les 5 principales causes de mortalité dans des sous-régions selectionnées
-  3) L'évolution des décès par rapport à la démographie des regions de 1990 à 2019 
+  3) L'évolution des décès par rapport à la démographie des regions de 1990 à 2019
+  4) Nuage de point présentant une region à une date donnée, le taux de mortalité comparée au PIB, mais aussi le ratio de     décès par cause 
 
 
 D'autres questions pourront être ajoutées au fur et à mesure pour plus de précisions et d'interprétations
