@@ -10,9 +10,9 @@ output:
 
 ## Contexte du problème
   Il est question d'analyser des données concernant les causes de mortalité dans le monde. Pour mener à bien cette analyse, nous avons defini des questions sur lesquelles travailler:
-  1) representation sur carte graphique des décès en fonction par cause et par année
+  1) representation sur carte graphique des Décès en million en fonction par cause et par année
   2) Les 5 principales causes sur des regions selectionnées
-  3) L'évolution des décès et de la démographie sur des regions de 1990 à 2019 
+  3) L'évolution des Décès en million et de la démographie sur des regions de 1990 à 2019 
 
 
 D'autres questions pourront être ajoutées au fur et à mesure pour plus de précisions et d'interprétations
@@ -73,7 +73,7 @@ data <- left_join(CausesData, CountriesData, by=c("iso_code"="iso_code", "Year"=
 
 
 
-# Représentation surla carte géographique des décès en fonction par cause et par année
+# Représentation surla carte géographique des Décès en million en fonction par cause et par année
 ```{r}
 world_data <- ggplot2::map_data('world')
 world_data <- fortify(world_data) %>% select(long, lat, group, region)
@@ -98,12 +98,12 @@ year <- distinct(data, Year) %>% arrange(Year)
 
 # Define UI for app that draws a histogram ----
 ui <- page_sidebar(
-  title = "Représentation sur carte graphique des nombres de décès dans le monde par causes et par années",
+  title = "Représentation sur carte graphique des nombres de Décès en million dans le monde par causes et par années",
   sidebar = sidebar(
     helpText("Variables"),
     selectInput(
       "cause",
-      label="Causes de décès",
+      label="Causes de Décès en million",
       choices = causesName,
       selected = "Acute hepatitis"
     ),
@@ -152,7 +152,7 @@ shinyApp(ui = ui, server = server)
 
 # Les 5 principales causes sur des regions selectionnées
 
-## Ces sous-régions de chaque continent avec 5 causes de décès populaires
+## Ces sous-régions de chaque continent avec 5 causes de Décès en million populaires
 
 ### Asie (5 sub): Asie central, Asia de l'est, Asie du sud-est, Asia du sud et Asie de l'ouest
 ```{r}
@@ -386,7 +386,7 @@ ggplot(RegionNorthernAmerica , aes(x=`Causes name`, y=Death_numbers, fill=`Cause
   coord_flip()+
   guides(fill=FALSE)
 ```
-# Courbes d'évolution du nombre de décès au cours des années de certaines régions
+# Courbes d'évolution du nombre de Décès en million au cours des années de certaines régions
 
 ## L'Afrique sub-sahérienne et l'Afrique du nord
 
@@ -409,19 +409,19 @@ africaData <- left_join(sumAfricaPopulation, sumAfricaDeaths, by=c("Year"="Year"
 plotSubSaharanAfrica <- africaData %>%
   filter(`sub-region`=="Sub-Saharan Africa") %>%
   ggplot(aes(x=Year)) + 
-  geom_line(aes(y = death_numbers, color="Décès")) +
-  geom_line(aes(y = population, color="Population"))+
-  scale_color_manual(values = c("Décès" = "red", "Population" = "blue")) +
-  scale_x_continuous(breaks = seq(1990, 2019, by = 2))+
+  geom_line(aes(y = death_numbers, color="Décès en million en million")) +
+  geom_line(aes(y = population, color="Population en centaine de millions"))+
+  scale_color_manual(values = c("Décès en million en million" = "red", "Population en centaine de millions" = "blue")) +
+  scale_x_continuous(breaks = seq(1990, 2019, by = 4))+
   labs(color = "Nombre", title = "Afrique sub-sahérienne");
 
 plotNorthernAfrica <- africaData %>%
   filter(`sub-region`=="Northern Africa") %>%
   ggplot(aes(x=Year)) + 
-  geom_line(aes(y = death_numbers, color="Décès")) +
-  geom_line(aes(y = population, color="Population"))+
-  scale_color_manual(values = c("Décès" = "red", "Population" = "blue")) +
-  scale_x_continuous(breaks = seq(1990, 2019, by = 2))+
+  geom_line(aes(y = death_numbers, color="Décès en million en million")) +
+  geom_line(aes(y = population, color="Population en centaine de millions"))+
+  scale_color_manual(values = c("Décès en million en million" = "red", "Population en centaine de millions" = "blue")) +
+  scale_x_continuous(breaks = seq(1990, 2019, by = 4))+
   labs(color = "Nombre",title = "Afrique du nord")
 
 plotSubSaharanAfrica
@@ -446,20 +446,20 @@ americaData <- left_join(sumAmericaPopulation, sumAmericaDeaths, by=c("Year"="Ye
 plotNorthernAmerica <- americaData %>%
   filter(`sub-region`=="Northern America") %>%
   ggplot(aes(x = Year)) + 
-  geom_line(aes(y = death_numbers, color = "Décès"), size = 0.5) +
-  geom_line(aes(y = population, color = "Population"), size = 0.5) +
-  scale_color_manual(values = c("Décès" = "red", "Population" = "blue")) +
+  geom_line(aes(y = death_numbers, color = "Décès en million"), size = 0.5) +
+  geom_line(aes(y = population, color = "Population en centaine de millions"), size = 0.5) +
+  scale_color_manual(values = c("Décès en million" = "red", "Population en centaine de millions" = "blue")) +
   labs(color = "Title", title = "Amérique du nord")+
-  scale_x_continuous(breaks = seq(1990, 2019, by = 2))
+  scale_x_continuous(breaks = seq(1990, 2019, by = 4))
 
 plotLatinAndCaribbeanAmerica <- americaData %>%
   filter(`sub-region`=="Latin America and the Caribbean") %>%
   ggplot(aes(x = Year)) + 
-  geom_line(aes(y = death_numbers, color = "Décès"), size = 0.5) +
-  geom_line(aes(y = population, color = "Population"), size = 0.5) +
-  scale_color_manual(values = c("Décès" = "red", "Population" = "blue")) +
+  geom_line(aes(y = death_numbers, color = "Décès en million"), size = 0.5) +
+  geom_line(aes(y = population, color = "Population en centaine de millions"), size = 0.5) +
+  scale_color_manual(values = c("Décès en million" = "red", "Population en centaine de millions" = "blue")) +
   labs(color = "Nombre", title = "Amérique Latine et les caraïbes")+
-  scale_x_continuous(breaks = seq(1990, 2019, by = 2))
+  scale_x_continuous(breaks = seq(1990, 2019, by = 4))
 
 
 plotNorthernAmerica
@@ -486,20 +486,20 @@ plotSouthernAndWesternEurope <- europeData %>%
   group_by(Year) %>%
   summarise(death_numbers=sum(death_numbers), population=sum(population)) %>%
   ggplot(aes(x = Year)) + 
-  geom_line(aes(y = death_numbers, color = "Décès"), size = 0.5) +
-  geom_line(aes(y = population, color = "Population"), size = 0.5) +
-  scale_color_manual(values = c("Décès" = "red", "Population" = "blue")) +
+  geom_line(aes(y = death_numbers, color = "Décès en million"), size = 0.5) +
+  geom_line(aes(y = population, color = "Population en centaine de millions"), size = 0.5) +
+  scale_color_manual(values = c("Décès en million" = "red", "Population en centaine de millions" = "blue")) +
   labs(color = "Title", title = "Europe du sud et de l'ouest")+
-  scale_x_continuous(breaks = seq(1990, 2019, by = 2))
+  scale_x_continuous(breaks = seq(1990, 2019, by = 4))
 
 plotEasternEurope <- europeData %>%
   filter(`sub-region`==c("Eastern Europe")) %>%
   ggplot(aes(x = Year)) + 
-  geom_line(aes(y = death_numbers, color = "Décès"), size = 0.5) +
-  geom_line(aes(y = population, color = "Population"), size = 0.5) +
-  scale_color_manual(values = c("Décès" = "red", "Population" = "blue")) +
+  geom_line(aes(y = death_numbers, color = "Décès en million"), size = 0.5) +
+  geom_line(aes(y = population, color = "Population en centaine de millions"), size = 0.5) +
+  scale_color_manual(values = c("Décès en million" = "red", "Population en centaine de millions" = "blue")) +
   labs(color = "Title", title = "Europe de l'est")+
-  scale_x_continuous(breaks = seq(1990, 2019, by = 2))
+  scale_x_continuous(breaks = seq(1990, 2019, by = 4))
 
 plotSouthernAndWesternEurope
 plotEasternEurope
@@ -526,31 +526,31 @@ asiaData <- left_join(sumAsiaPopulation, sumAsiaDeaths, by=c("Year"="Year", "sub
 plotWesternAsia <- asiaData %>%
   filter(`sub-region`=="Western Asia") %>%
   ggplot(aes(x = Year)) + 
-  geom_line(aes(y = death_numbers, color = "Décès"), size = 0.5) +
-  geom_line(aes(y = population, color = "Population"), size = 0.5) +
-  scale_color_manual(values = c("Décès" = "red", "Population" = "blue")) +
+  geom_line(aes(y = death_numbers, color = "Décès en million"), size = 0.5) +
+  geom_line(aes(y = population, color = "Population en centaine de millions"), size = 0.5) +
+  scale_color_manual(values = c("Décès en million" = "red", "Population en centaine de millions" = "blue")) +
   labs(color = "Title", title = "Asie de l'ouest")+
-  scale_x_continuous(breaks = seq(1990, 2019, by = 2))
+  scale_x_continuous(breaks = seq(1990, 2019, by = 4))
 
 plotCentralAsia <- asiaData %>%
   filter(`sub-region`=="Central Asia") %>%
   ggplot(aes(x = Year)) + 
-  geom_line(aes(y = death_numbers, color = "Décès"), size = 0.5) +
-  geom_line(aes(y = population, color = "Population"), size = 0.5) +
-  scale_color_manual(values = c("Décès" = "red", "Population" = "blue")) +
+  geom_line(aes(y = death_numbers, color = "Décès en million"), size = 0.5) +
+  geom_line(aes(y = population, color = "Population en centaine de millions"), size = 0.5) +
+  scale_color_manual(values = c("Décès en million" = "red", "Population en centaine de millions" = "blue")) +
   labs(color = "Title", title = "Asie central")+
-  scale_x_continuous(breaks = seq(1990, 2019, by = 2))
+  scale_x_continuous(breaks = seq(1990, 2019, by = 4))
 
 plotSouthEasternAndEsternAsia <- asiaData %>%
   filter(`sub-region`==c("South-eastern Asia", "Eastern Asia")) %>%
   group_by(Year) %>%
   summarise(death_numbers=sum(death_numbers), population=sum(population)) %>%
   ggplot(aes(x = Year)) + 
-  geom_line(aes(y = death_numbers, color = "Décès"), size = 0.5) +
-  geom_line(aes(y = population, color = "Population"), size = 0.5) +
-  scale_color_manual(values = c("Décès" = "red", "Population" = "blue")) +
+  geom_line(aes(y = death_numbers, color = "Décès en million"), size = 0.5) +
+  geom_line(aes(y = population, color = "Population en centaine de millions"), size = 0.5) +
+  scale_color_manual(values = c("Décès en million" = "red", "Population en centaine de millions" = "blue")) +
   labs(color = "Title", title = "Asie du sud-est et de l'est") +
-  scale_x_continuous(breaks = seq(1990, 2019, by = 2))
+  scale_x_continuous(breaks = seq(1990, 2019, by = 4))
 
 plotSouthEasternAndEsternAsia
 plotCentralAsia
@@ -558,4 +558,4 @@ plotWesternAsia
 ```
 
 # Bilan
-
+Au terme de cette analyse, nous constatons diverses causes de Décès en million à travers le monde. Cela peut être dû au climat, aux habitudes qu'elles soient comportementales ou alimentaires. La cause qui revient le plus souvent est celle des maladies cardiovasculaires. Nous observons également le maintien de l'écart entre la démographie en centaine de millions et les décès en million dans une région, c'est à dire plus la population augmente, plus le nombre de Décès en million augmente.
