@@ -9,10 +9,11 @@ output:
 ---
 
 ## Contexte du problème
-  Il est question d'analyser des données concernant les causes de mortalité dans le monde. Pour mener à bien cette analyse, nous avons defini des questions sur lesquelles travailler:
-  1) representation sur carte graphique des Décès en million en fonction par cause et par année
-  2) Les 5 principales causes sur des regions selectionnées
-  3) L'évolution des Décès en million et de la démographie sur des regions de 1990 à 2019 
+   Il est question d'analyser des données concernant les causes de mortalité dans le monde. Pour mener à bien cette 
+  analyse, nous avons defini des questions sur lesquelles travailler:
+  1) Représentation sur carte graphique des décès en fonction des Causes et par année
+  2) Les 5 principales causes de mortalité dans des sous-régions selectionnées
+  3) L'évolution des décès par rapport à la démographie des regions de 1990 à 2019 
 
 
 D'autres questions pourront être ajoutées au fur et à mesure pour plus de précisions et d'interprétations
@@ -41,7 +42,8 @@ CausesData <- read_csv("20222703-causes-f-death-clean-output-v2.0.csv") %>%
   filter(!is.na(iso_code));
 ```
 
-## Données démographique et économique des pays
+## Données démographiques et économiques des pays
+
 ```{r}
 CountriesData <- read_csv("owid-co2-data.csv") %>%
   select(year, iso_code, population, gdp) %>%
@@ -73,7 +75,7 @@ data <- left_join(CausesData, CountriesData, by=c("iso_code"="iso_code", "Year"=
 
 
 
-# Représentation surla carte géographique des Décès en million en fonction par cause et par année
+# Représentation sur la carte géographique des Décès en million par cause et par année
 ```{r}
 world_data <- ggplot2::map_data('world')
 world_data <- fortify(world_data) %>% select(long, lat, group, region)
@@ -150,9 +152,9 @@ shinyApp(ui = ui, server = server)
 
 ```
 
-# Les 5 principales causes sur des regions selectionnées
+# Les 5 principales causes de mortalité dans des regions selectionnées
 
-## Ces sous-régions de chaque continent avec 5 causes de Décès en million populaires
+## Ces sous-régions de chaque continent avec 5 causes de mortalité en million
 
 ### Asie (5 sub): Asie central, Asia de l'est, Asie du sud-est, Asia du sud et Asie de l'ouest
 ```{r}
@@ -164,12 +166,11 @@ RegionCentralAsia <- data %>%
   arrange(`sub-region`, desc(Death_numbers)) %>%
   slice_max(order_by = Death_numbers, n = 5)
 
-ggplot(RegionCentralAsia, aes(x=`Causes name`, y=Death_numbers, fill=`Causes name`)) +
+ggplot(RegionCentralAsia, aes(y=`Causes name`, x=Death_numbers, fill=`Causes name`)) +
   geom_bar(stat="identity") +
   theme_minimal() + 
   labs(title="Top 5 Causes of Death in Central Asia",
        y="Number of Deaths in millions") +
-  coord_flip()+
   guides(fill=FALSE)
 
 
@@ -182,13 +183,11 @@ RegionEasternAsia <- data %>%
   arrange(`sub-region`, desc(Death_numbers)) %>%
   slice_max(order_by = Death_numbers, n = 5)
 
-ggplot(RegionEasternAsia, aes(x=`Causes name`, y=Death_numbers, fill=`Causes name`)) +
+ggplot(RegionEasternAsia, aes(y=`Causes name`, x=Death_numbers, fill=`Causes name`)) +
   geom_bar(stat="identity") +
- 
   theme_minimal() + 
   labs(title="Top 5 Causes of Death in Eastern Asia",
        y="Number of Deaths in millions") +
-  coord_flip()+
   guides(fill=FALSE)
 
 
@@ -219,13 +218,12 @@ RegionSouthernAsia <- data %>%
   arrange(`sub-region`, desc(Death_numbers)) %>%
   slice_max(order_by = Death_numbers, n = 5)
 
-ggplot(RegionSouthernAsia, aes(x=`Causes name`, y=Death_numbers, fill=`Causes name`)) +
+ggplot(RegionSouthernAsia, aes(y=`Causes name`, x=Death_numbers, fill=`Causes name`)) +
   geom_bar(stat="identity") +
   theme_minimal() + 
   labs(title="Top 5 Causes of Death in Southern Asia",
        x="Cause of Death",
        y="Number of Deaths in millions") +
-  coord_flip()+
   guides(fill=FALSE)
 
 
@@ -237,13 +235,12 @@ RegionWesternAsia <- data %>%
   arrange(`sub-region`, desc(Death_numbers)) %>%
   slice_max(order_by = Death_numbers, n = 5)
 
-ggplot(RegionWesternAsia, aes(x=`Causes name`, y=Death_numbers, fill=`Causes name`)) +
+ggplot(RegionWesternAsia, aes(y=`Causes name`, x=Death_numbers, fill=`Causes name`)) +
   geom_bar(stat="identity") +
  
   theme_minimal() + 
   labs(title="Top 5 Causes of Death in Western Asia",
        y="Number of Deaths in millions") +
-  coord_flip()+
   guides(fill=FALSE)
   
 ```
@@ -257,14 +254,12 @@ RegionNorthernEurope <- data %>%
   arrange(`sub-region`, desc(Death_numbers)) %>%
   slice_max(order_by = Death_numbers, n = 5)
 
-ggplot(RegionNorthernEurope, aes(x=`Causes name`, y=Death_numbers, fill=`Causes name`)) +
+ggplot(RegionNorthernEurope, aes(y=`Causes name`, x=Death_numbers, fill=`Causes name`)) +
   geom_bar(stat="identity") +
   theme_minimal() + 
   labs(title="Top 5 Causes of Death in Northern and Eastern Europe",
        y="Number of Deaths in millions") +
-  coord_flip()+
   guides(fill=FALSE)
-
 
 
 
@@ -276,20 +271,16 @@ RegionSouthernEurope <- data %>%
   arrange(`sub-region`, desc(Death_numbers)) %>%
   slice_max(order_by = Death_numbers, n = 5)
 
-ggplot(RegionSouthernEurope, aes(x=`Causes name`, y=Death_numbers, fill=`Causes name`)) +
+ggplot(RegionSouthernEurope, aes(y=`Causes name`, x=Death_numbers, fill=`Causes name`)) +
   geom_bar(stat="identity") +
   theme_minimal() + 
   labs(title="Top 5 Causes of Death in Southern and Western Europe",
        y="Number of Deaths in millions") +
-  coord_flip()+
   guides(fill=FALSE)
-
-
-
 
 ```
 
-##### Afrique (2-sub): Afrique du nord et Afrique sub-sahérienne
+### Afrique (2-sub): Afrique du nord et Afrique sub-sahérienne
 ```{r}
 RegionNorthernAfrica <- data %>%
   filter(!is.na(`Death Numbers`)) %>%
@@ -299,14 +290,13 @@ RegionNorthernAfrica <- data %>%
   arrange(`sub-region`, desc(Death_numbers)) %>%
   slice_max(order_by = Death_numbers, n = 5)
 
-ggplot(RegionNorthernAfrica, aes(x=`Causes name`, y=Death_numbers, fill=`Causes name`)) +
+ggplot(RegionNorthernAfrica, aes(y=`Causes name`, x=Death_numbers, fill=`Causes name`)) +
   geom_bar(stat="identity") +
  
   theme_minimal() + 
   labs(title="Top 5 Causes of Death in Northern Africa",
        x="Cause of Death",
        y="Number of Deaths in millions") +
-  coord_flip()+
   guides(fill=FALSE)
 
 
@@ -318,14 +308,13 @@ RegionSubSaharan <- data %>%
   arrange(`sub-region`, desc(Death_numbers)) %>%
   slice_max(order_by = Death_numbers, n = 5)
 
-ggplot(RegionSubSaharan, aes(x=`Causes name`, y=Death_numbers, fill=`Causes name`)) +
+ggplot(RegionSubSaharan, aes(y=`Causes name`, x=Death_numbers, fill=`Causes name`)) +
   geom_bar(stat="identity") +
  
   theme_minimal() + 
   labs(title="Top 5 Causes of Death in Sub-Saharan Africa",
        x="Cause of Death",
        y="Number of Deaths in millions") +
-  coord_flip()+
   guides(fill=FALSE)
 
 
@@ -337,7 +326,7 @@ ggplot(RegionSubSaharan, aes(x=`Causes name`, y=Death_numbers, fill=`Causes name
 
 
 
-##### Amerique (2-sub): Amerique du nord et America Latine et les caraïbes
+### Amerique (2-sub): Amerique du nord et America Latine et les caraïbes
 ```{r}
 sousRegionAmericas<- data %>%
   filter(!is.na(`Death Numbers`)) %>%
@@ -357,14 +346,13 @@ RegionLatinAndCari <- data %>%
   arrange(`sub-region`, desc(Death_numbers)) %>%
   slice_max(order_by = Death_numbers, n = 5)
 
-ggplot(RegionLatinAndCari , aes(x=`Causes name`, y=Death_numbers, fill=`Causes name`)) +
+ggplot(RegionLatinAndCari , aes(y=`Causes name`, x=Death_numbers, fill=`Causes name`)) +
   geom_bar(stat="identity") +
  
   theme_minimal() + 
   labs(title="Top 5 Causes of Death in Latin America and the Caribbean",
        x="Cause of Death",
        y="Number of Deaths in millions") +
-  coord_flip()+
   guides(fill=FALSE)
 
 
@@ -376,14 +364,13 @@ RegionNorthernAmerica <- data %>%
   arrange(`sub-region`, desc(Death_numbers)) %>%
   slice_max(order_by = Death_numbers, n = 5)
 
-ggplot(RegionNorthernAmerica , aes(x=`Causes name`, y=Death_numbers, fill=`Causes name`)) +
+ggplot(RegionNorthernAmerica , aes(y=`Causes name`, x=Death_numbers, fill=`Causes name`)) +
   geom_bar(stat="identity") +
  
   theme_minimal() + 
   labs(title="Top 5 Causes of Death in Northern America",
        x="Cause of Death",
        y="Number of Deaths in millions") +
-  coord_flip()+
   guides(fill=FALSE)
 ```
 # Courbes d'évolution du nombre de Décès en million au cours des années de certaines régions
@@ -556,6 +543,123 @@ plotSouthEasternAndEsternAsia
 plotCentralAsia
 plotWesternAsia
 ```
+
+# Nuages de point
+## Sub-Sahara Africa en 2016
+A la sortie de l'épidémie d'Ebola qui a sévi en Afrique de l'Ouest, principalement en Guinée, au Liberia et en ####Sierra Leone, a été l'une des plus graves de l'histoire de la maladie. Elle a également touché d'autres pays de ####la région, bien que dans une moindre mesure.
+```{r}
+subSahara2015 <- data %>%
+filter(`sub-region` == "Sub-Saharan Africa")  %>%
+group_by(Year)%>%
+filter(!is.na(gdp)) %>%
+filter(Year == 2015) %>%
+filter(!is.na(`Death Numbers`))%>%
+  group_by(`Causes name`) %>%
+  summarize(`Death Numbers`=sum(as.numeric(`Death Numbers`))) %>%
+  arrange(desc(`Death Numbers`))%>%
+  top_n(5);
+
+subSahara2 <- data %>%
+filter(`sub-region` == "Sub-Saharan Africa")  %>%
+group_by(Year)%>%
+filter(!is.na(gdp)) %>%
+filter(!is.na(`Death Numbers`))%>%
+filter(Year == 2015) %>%
+  distinct(Entity, population, gdp) %>%
+  summarise(PIB = sum(gdp), population = sum(population))
+
+PIB_total <- sum(subSahara2$PIB) / 1000000000000000
+total_population <- sum(subSahara2$population)
+total_deces <- sum(subSahara2015$`Death Numbers`)
+
+taux_mortalite = total_deces / total_population
+
+ratio_deces_par_cause <- subSahara2015$`Death Numbers` / total_deces
+
+
+ggplot(subSahara2015, aes(x = PIB_total, y = taux_mortalite, shape = `Causes name`, color = ratio_deces_par_cause))+
+  geom_point(position = position_jitter(width = 0.3, height = 0.3), size = 2) +
+  labs(x = "PIB total de la sous-région", y = "Taux de mortalité", color = "Ratio de décès par cause") 
+
+```
+
+## Western Europe en 2010
+2009 - 2010 une période qui pourrait être considérée comme particulièrement significative en Europe occidentale est celle de la pandémie de grippe H1N1 
+```{r}
+westernEurope2010 <- data %>%
+filter(`sub-region` == "Western Europe")  %>%
+group_by(Year)%>%
+filter(!is.na(gdp)) %>%
+filter(Year == 2010) %>%
+filter(!is.na(`Death Numbers`))%>%
+  group_by(`Causes name`) %>%
+  summarize(`Death Numbers`=sum(as.numeric(`Death Numbers`))) %>%
+  arrange(desc(`Death Numbers`))%>%
+  top_n(5);
+
+westernEurope2 <- data %>%
+filter(`sub-region` == "Western Europe")  %>%
+group_by(Year)%>%
+filter(!is.na(gdp)) %>%
+filter(!is.na(`Death Numbers`))%>%
+filter(Year == 2010) %>%
+  distinct(Entity, population, gdp) %>%
+  summarise(PIB = sum(gdp), population = sum(population))
+
+PIB_total <- sum(westernEurope2$PIB) / 1000000000000000
+total_population <- sum(westernEurope2$population)
+total_deces <- sum(westernEurope2010$`Death Numbers`)
+
+taux_mortalite = total_deces / total_population
+
+ratio_deces_par_cause <- westernEurope2010$`Death Numbers` / total_deces
+
+
+ggplot(westernEurope2010, aes(x = PIB_total, y = taux_mortalite, shape = `Causes name`, color = ratio_deces_par_cause))+
+  geom_point(position = position_jitter(width = 0.3, height = 0.3), size = 2) +
+  labs(x = "PIB total de la sous-région", y = "Taux de mortalité", color = "Ratio de décès par cause") 
+
+```
+
+
+## Eastern Asia en 2003
+#### Une période qui pourrait être considérée comme particulièrement critique pour l'Asie de l'Est est celle 
+#### de l'épidémie de syndrome respiratoire aigu sévère (SRAS) en 2002-2003. Le SRAS, causé par un coronavirus, a #### émergé en Chine continentale en novembre 2002 avant de se propager rapidement à d'autres pays de la région et #### au-delà.
+```{r}
+easternAsia2003 <- data %>%
+filter(`sub-region` == "Eastern Asia")  %>%
+group_by(Year)%>%
+filter(!is.na(gdp)) %>%
+filter(Year == 2003) %>%
+filter(!is.na(`Death Numbers`))%>%
+  group_by(`Causes name`) %>%
+  summarize(`Death Numbers`=sum(as.numeric(`Death Numbers`))) %>%
+  arrange(desc(`Death Numbers`))%>%
+  top_n(5);
+
+easternAsia2 <- data %>%
+filter(`sub-region` == "Eastern Asia")  %>%
+group_by(Year)%>%
+filter(!is.na(gdp)) %>%
+filter(!is.na(`Death Numbers`))%>%
+filter(Year == 2003) %>%
+  distinct(Entity, population, gdp) %>%
+  summarise(PIB = sum(gdp), population = sum(population))
+
+PIB_total <- sum(easternAsia2$PIB) / 1000000000
+total_population <- sum(easternAsia2$population)
+total_deces <- sum(easternAsia2003$`Death Numbers`) 
+
+taux_mortalite = (total_deces / total_population) 
+
+ratio_deces_par_cause <- (easternAsia2003$`Death Numbers` / total_deces)  
+
+
+ggplot(easternAsia2003, aes(x = PIB_total, y = taux_mortalite, shape = `Causes name`, color = ratio_deces_par_cause))+
+  geom_point(position = position_jitter(width = 0.3, height = 0.3), size = 2) +
+  labs(x = "PIB total de la sous-région en milliards", y = "Taux de mortalité en pourcentage", color = "Ratio de décès par cause") 
+```
+
 
 # Bilan
 Au terme de cette analyse, nous constatons diverses causes de Décès en million à travers le monde. Cela peut être dû au climat, aux habitudes qu'elles soient comportementales ou alimentaires. La cause qui revient le plus souvent est celle des maladies cardiovasculaires. Nous observons également le maintien de l'écart entre la démographie en centaine de millions et les décès en million dans une région, c'est à dire plus la population augmente, plus le nombre de Décès en million augmente.
