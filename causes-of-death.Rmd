@@ -6,7 +6,6 @@ output:
   pdf_document: default
   html_document:
     df_print: paged
-runtime: shiny
 ---
 
 ## Contexte du problème
@@ -82,6 +81,7 @@ world_data <- ggplot2::map_data('world')
 world_data <- fortify(world_data) %>% select(long, lat, group, region)
 head(world_data)
 ```
+
 ### modification des noms de pays
 Ce code consiste à modifier le nom de certains pays dans notre jeu de données qui sont différents de ceux fournis par ggplot2::map_data
 ```{r}
@@ -153,6 +153,8 @@ shinyApp(ui = ui, server = server)
 
 ```
 
+
+
 # Les 5 principales causes de mortalité dans des regions selectionnées
 
 ## Ces sous-régions de chaque continent avec 5 causes de mortalité en million
@@ -171,7 +173,7 @@ ggplot(RegionCentralAsia, aes(y=`Causes name`, x=Death_numbers, fill=`Causes nam
   geom_bar(stat="identity") +
   theme_minimal() + 
   labs(title="Top 5 Causes of Death in Central Asia",
-       y="Number of Deaths in millions") +
+       x="Number of Deaths in millions") +
   guides(fill=FALSE)
 
 
@@ -188,7 +190,7 @@ ggplot(RegionEasternAsia, aes(y=`Causes name`, x=Death_numbers, fill=`Causes nam
   geom_bar(stat="identity") +
   theme_minimal() + 
   labs(title="Top 5 Causes of Death in Eastern Asia",
-       y="Number of Deaths in millions") +
+       x="Number of Deaths in millions") +
   guides(fill=FALSE)
 
 
@@ -201,12 +203,12 @@ RegionSoutheasternAsia <- data %>%
   arrange(`sub-region`, desc(Death_numbers)) %>%
   slice_max(order_by = Death_numbers, n = 5)
 
-ggplot(RegionSoutheasternAsia, aes(x=`Causes name`, y=Death_numbers, fill=`Causes name`)) +
+ggplot(RegionSoutheasternAsia, aes(y=`Causes name`, x=Death_numbers, fill=`Causes name`)) +
   geom_bar(stat="identity") +
  
   theme_minimal() + 
   labs(title="Top 5 Causes of Death in South-eastern Asia",
-       y="Number of Deaths in millions") +
+       x="Number of Deaths in millions") +
   coord_flip()+
   guides(fill=FALSE)
 
@@ -223,8 +225,7 @@ ggplot(RegionSouthernAsia, aes(y=`Causes name`, x=Death_numbers, fill=`Causes na
   geom_bar(stat="identity") +
   theme_minimal() + 
   labs(title="Top 5 Causes of Death in Southern Asia",
-       x="Cause of Death",
-       y="Number of Deaths in millions") +
+       x="Number of Deaths in millions") +
   guides(fill=FALSE)
 
 
@@ -241,7 +242,7 @@ ggplot(RegionWesternAsia, aes(y=`Causes name`, x=Death_numbers, fill=`Causes nam
  
   theme_minimal() + 
   labs(title="Top 5 Causes of Death in Western Asia",
-       y="Number of Deaths in millions") +
+       x="Number of Deaths in millions") +
   guides(fill=FALSE)
   
 ```
@@ -276,7 +277,7 @@ ggplot(RegionSouthernEurope, aes(y=`Causes name`, x=Death_numbers, fill=`Causes 
   geom_bar(stat="identity") +
   theme_minimal() + 
   labs(title="Top 5 Causes of Death in Southern and Western Europe",
-       y="Number of Deaths in millions") +
+       x="Number of Deaths in millions") +
   guides(fill=FALSE)
 
 ```
@@ -399,18 +400,18 @@ africaData <- left_join(sumAfricaPopulation, sumAfricaDeaths, by=c("Year"="Year"
 plotSubSaharanAfrica <- africaData %>%
   filter(`sub-region`=="Sub-Saharan Africa") %>%
   ggplot(aes(x=Year)) + 
-  geom_line(aes(y = death_numbers, color="Décès en million en million")) +
+  geom_line(aes(y = death_numbers, color="Décès en million")) +
   geom_line(aes(y = population, color="Population en centaine de millions"))+
-  scale_color_manual(values = c("Décès en million en million" = "red", "Population en centaine de millions" = "blue")) +
+  scale_color_manual(values = c("Décès en million" = "red", "Population en centaine de millions" = "blue")) +
   scale_x_continuous(breaks = seq(1990, 2019, by = 4))+
   labs(color = "Nombre", title = "Afrique sub-sahérienne");
 
 plotNorthernAfrica <- africaData %>%
   filter(`sub-region`=="Northern Africa") %>%
   ggplot(aes(x=Year)) + 
-  geom_line(aes(y = death_numbers, color="Décès en million en million")) +
+  geom_line(aes(y = death_numbers, color="Décès en million")) +
   geom_line(aes(y = population, color="Population en centaine de millions"))+
-  scale_color_manual(values = c("Décès en million en million" = "red", "Population en centaine de millions" = "blue")) +
+  scale_color_manual(values = c("Décès en million" = "red", "Population en centaine de millions" = "blue")) +
   scale_x_continuous(breaks = seq(1990, 2019, by = 4))+
   labs(color = "Nombre",title = "Afrique du nord")
 
