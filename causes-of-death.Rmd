@@ -6,6 +6,7 @@ output:
   pdf_document: default
   html_document:
     df_print: paged
+runtime: shiny
 ---
 
 ## Contexte du problème
@@ -376,7 +377,9 @@ ggplot(RegionNorthernAmerica , aes(y=`Causes name`, x=Death_numbers, fill=`Cause
 # Courbes d'évolution du nombre de Décès en million au cours des années de certaines régions
 
 ## L'Afrique sub-sahérienne et l'Afrique du nord
-
+#### En Afrique subsaharienne, on observe un pic de décès en 1994. En effet, nous avons assisté à un évènement, le génocide au Rwanda qui d'après l'ONU a fait environ 800000 morts. 
+#### De 1996 à 2003, on observe également une forte augmentation du nombre de décès. Cela peut être dû à l'accès difficile aux soins, la mauvaise qualité de vie, conflits, également les maladies infectieuses et néonatales. L’épidémie de VIH/SIDA a également eu un impact significatif en Afrique subsaharienne
+### Depuis 2003 on observe une baisse de mortalité, cela est dû à une amélioration de la qualité de vie avec des programmes de prévention, de traitement et de sensibilisation et e développement socio-économique
 ```{r}
 sumAfricaPopulation <- data %>% 
   filter(region=="Africa") %>%
@@ -665,4 +668,4 @@ ggplot(easternAsia2003, aes(x = PIB_total, y = taux_mortalite, shape = `Causes n
 
 # Bilan
 Au terme de cette analyse, nous constatons diverses causes de Décès en million à travers le monde. Cela peut être dû au climat, aux habitudes qu'elles soient comportementales ou alimentaires. La cause qui revient le plus souvent est celle des maladies cardiovasculaires, cela s'explique par plusieurs raisons en fonction des sous régions entre-autres: Le vieillissement de la population, Urbanisation et changements de mode de vie (une alimentation riche en graisses et en sucres dans les zones urbaines), accès inégal aux soins de santé. Nous observons également le maintien de l'écart entre la démographie en centaine de millions et les décès en million dans une région, c'est à dire plus la population augmente, plus le nombre de Décès en million augmente.
-- En Afrique subsaharienne, durant cette période, accès aux soins, qualité de vie, conflits, ce qui a pu influencer les taux de mortalité dus aux maladies infectieuses et néonatales. L’épidémie de VIH/SIDA a également eu un impact significatif en Afrique subsaharienne, avec des programmes de prévention, de traitement et de sensibilisation. Le développement socio-économique.
+
